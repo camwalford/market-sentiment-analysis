@@ -4,6 +4,11 @@
 
 # IntelliJ environment settings
 .idea
+!.idea/modules.xml  # Contains information about project modules
+!.idea/*.iml        # .iml files define the module structure
+!.idea/vcs.xml      # Version control settings
+!.idea/codeStyles   # Share code style settings across team members
+!.idea/misc.xml     # Project-wide settings like language level
 
 # Ignore Gradle GUI config
 gradle-app.setting
