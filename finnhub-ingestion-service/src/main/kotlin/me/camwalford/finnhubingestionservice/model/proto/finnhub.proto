@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package me.camwalford.finnhubingestionservice.model.protobuf;
+
+// Message representing a single Market News item
+message MarketNewsResponse {
+  string category = 1;
+  string headline = 2;
+  string source = 3;
+  string summary = 4;
+  string url = 5;
+  string related = 6;
+  int64 datetime = 7; // UNIX timestamp
+  string image = 8;
+}
+
+// Wrapper message for a list of Market News items
+message MarketNewsList {
+  repeated MarketNewsResponse data = 1;
+}

@@ -7,9 +7,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
-finnhubb:
+finnhub:
   api:
-    baseUrl: ${FINNHUBB_API_BASE_URL:https://finnhub.io/api/v1/}  # Externalized with default
     bearerToken: ${FINNHUBB_API_BEARER_TOKEN}                   # Externalized, no default for security
 
 logging:
