@@ -9,7 +9,7 @@ spring:
 
 finnhubb:
   api:
-    baseUrl: ${FINNHUBB_API_BASE_URL:https://api.twitter.com/2}  # Externalized with default
+    baseUrl: ${FINNHUBB_API_BASE_URL:https://finnhub.io/api/v1/}  # Externalized with default
     bearerToken: ${FINNHUBB_API_BEARER_TOKEN}                   # Externalized, no default for security
 
 logging:

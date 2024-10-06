@@ -31,7 +31,7 @@ dependencies {
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("com.google.protobuf:protobuf-kotlin:3.25.1")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-
+	implementation("io.finnhub:kotlin-client:2.0.20")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
