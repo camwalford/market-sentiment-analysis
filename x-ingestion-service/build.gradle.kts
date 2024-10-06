@@ -3,6 +3,7 @@ plugins {
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.3.4"
 	id("io.spring.dependency-management") version "1.1.6"
+	id("com.google.protobuf") version "0.9.4"
 }
 
 group = "me.camwalford"
@@ -16,6 +17,7 @@ java {
 
 repositories {
 	mavenCentral()
+	google()
 }
 
 dependencies {
@@ -24,6 +26,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.kafka:spring-kafka")
+	implementation("com.google.protobuf:protobuf-kotlin:3.25.1")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -39,4 +42,17 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+protobuf {
+	protoc {
+		artifact = "com.google.protobuf:protoc:3.25.1"
+	}
+	generateProtoTasks {
+		all().forEach { task ->
+			task.builtins {
+				create("kotlin")
+			}
+		}
+	}
 }
