@@ -4,14 +4,13 @@ package me.camwalford.finnhubingestionservice.config
 import jakarta.validation.constraints.NotBlank
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.validation.annotation.Validated
 
 
 @Configuration
-@ConfigurationProperties("finnhubb.api")
+@ConfigurationProperties("finnhub.api")
+@Validated
 data class FinnHubApiConfig(
-    @field:NotBlank("The Xapi base url must not be blank.")
-    var baseUrl: String = "",
-
-    @field:NotBlank("The Xapi bearer token must not be blank.")
-    var bearerToken: String = ""
+    @field:NotBlank("The finnhub api key must not be blank.")
+    var apiKey: String = ""
 )
