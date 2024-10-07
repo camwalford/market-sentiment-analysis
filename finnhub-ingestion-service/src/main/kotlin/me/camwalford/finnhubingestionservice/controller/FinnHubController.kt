@@ -15,5 +15,5 @@ class FinnHubController(private val finnHubService: FinnHubService) {
 
     @PostMapping("/market-news", produces = ["application/x-protobuf"])
     fun getMarketNews(@Valid @RequestBody request: MarketNewsRequest) =
-        finnHubService.fetchMarketNews(request.category, request.minId)
+        finnHubService.fetchMarketNewsList(request.category, request.minId)
 }
