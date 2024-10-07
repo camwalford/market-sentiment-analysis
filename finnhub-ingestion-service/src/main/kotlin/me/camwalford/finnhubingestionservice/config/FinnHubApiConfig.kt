@@ -11,6 +11,6 @@ import org.springframework.validation.annotation.Validated
 @ConfigurationProperties("finnhub.api")
 @Validated
 data class FinnHubApiConfig(
-    @field:NotBlank("The finnhub api key must not be blank.")
+    @NotBlank
     var apiKey: String = ""
 )
