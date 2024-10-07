@@ -2,6 +2,7 @@ package me.camwalford.finnhubingestionservice.config
 
 
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+import me.camwalford.finnhubingestionservice.model.protobuf.MarketNewsList
 import org.apache.kafka.clients.producer.ProducerConfig.*
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
@@ -18,7 +19,7 @@ class KafkaConfig() {
     private lateinit var bootstrapServers: String
 
     @Bean
-    fun producerFactory(): ProducerFactory<String, ByteArray> {
+    fun producerFactory(): ProducerFactory<String, MarketNewsList> {
         val configProps = mapOf(
             BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
             KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
@@ -28,7 +29,7 @@ class KafkaConfig() {
     }
 
     @Bean
-    fun kafkaTemplate(): KafkaTemplate<String, ByteArray> {
+    fun kafkaTemplate(): KafkaTemplate<String, MarketNewsList> {
         return KafkaTemplate(producerFactory())
     }
 }

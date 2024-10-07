@@ -2,9 +2,6 @@ package me.camwalford.finnhubingestionservice.client
 
 import org.springframework.stereotype.Component
 import io.finnhub.api.apis.DefaultApi
-import io.finnhub.api.infrastructure.ApiClient
-import jakarta.annotation.PostConstruct
-import me.camwalford.finnhubingestionservice.config.FinnHubConfig
 import me.camwalford.finnhubingestionservice.model.protobuf.MarketNewsList
 import me.camwalford.finnhubingestionservice.util.ProtobufConversionUtil
 import org.slf4j.LoggerFactory
@@ -18,7 +15,6 @@ class FinnHubClient(private val apiClient: DefaultApi) {
         logger.info("Fetching market news for category: $category with minId: $minId")
 
         val marketNewsData = apiClient.marketNews(category, minId)
-
         logger.debug("Raw market news data: {}", marketNewsData)
 
         return try {
@@ -31,3 +27,4 @@ class FinnHubClient(private val apiClient: DefaultApi) {
         }
     }
 }
+

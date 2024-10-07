@@ -5,7 +5,9 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}  # Externalized with default
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      value-serializer: org.apache.kafka.common.serialization.KafkaProtobufSerializer
+    topic:
+      market-news: market-news-topic
 
 finnhub:
   api:
