@@ -3,8 +3,6 @@ package me.camwalford.finnhubingestionservice.client
 import org.springframework.stereotype.Component
 import io.finnhub.api.apis.DefaultApi
 import io.finnhub.api.models.MarketNews
-import me.camwalford.finnhubingestionservice.model.protobuf.MarketNewsList
-import me.camwalford.finnhubingestionservice.util.ProtobufConversionUtil
 import org.slf4j.LoggerFactory
 
 @Component
