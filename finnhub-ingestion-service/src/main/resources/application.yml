@@ -6,12 +6,21 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.KafkaProtobufSerializer
-    topic:
-      market-news: market-news-topic
+
 
 finnhub:
   api:
     apiKey: ${FINNHUB_API_KEY}                  # Externalized, no default for security
+
+kafka:
+  topic:
+    market-news: market-news-topic
+  key:
+    market-news: general
+
+
+
+
 
 logging:
   level:
