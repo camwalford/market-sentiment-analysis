@@ -9,7 +9,7 @@ spring:
 
 finnhub:
   api:
-    bearerToken: ${FINNHUBB_API_BEARER_TOKEN}                   # Externalized, no default for security
+    apiKey: ${FINNHUB_API_KEY}                  # Externalized, no default for security
 
 logging:
   level:

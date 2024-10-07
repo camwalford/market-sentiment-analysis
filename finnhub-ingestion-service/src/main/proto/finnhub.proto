@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package me.camwalford.finnhubingestionservice.model.protobuf;
 
+option java_multiple_files = true;
+
 // Message representing a single Market News item
 message MarketNewsResponse {
   string category = 1;

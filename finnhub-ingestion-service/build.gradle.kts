@@ -21,6 +21,7 @@ java {
 repositories {
 	mavenCentral()
 	google()
+	maven("https://packages.confluent.io/maven/")
 }
 
 dependencies {
@@ -30,8 +31,14 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("com.google.protobuf:protobuf-kotlin:3.25.1")
+	implementation("com.google.protobuf:protobuf-java-util:3.14.0")
+
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("io.finnhub:kotlin-client:2.0.20")
+	implementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
+	implementation ("io.confluent:kafka-protobuf-serializer:7.5.0")
+
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
