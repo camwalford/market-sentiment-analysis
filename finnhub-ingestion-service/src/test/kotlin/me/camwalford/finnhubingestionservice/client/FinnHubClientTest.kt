@@ -20,12 +20,13 @@ class FinnHubClientTest {
   private lateinit var finnHubClient: FinnHubClient
 
   @Test
-  fun `should fetch market news and convert to a protobuf MarketNewsList object`() {
+  fun `should fetch market news and return a list of MarketNews objects`() {
     // Arrange
     val category = "general"
     val minId: Long = 1
     // Create a MarketNews object with sample values
-    val apiResponse = MarketNews(
+    val apiResponse = listOf(
+      MarketNews(
       category = category,
       datetime = System.currentTimeMillis(),
       headline = "Sample Headline",
@@ -35,12 +36,24 @@ class FinnHubClientTest {
       source = "News Source",
       summary = "This is a summary of the news article.",
       url = "https://sampleurl.com/article"
+    ),
+      MarketNews(
+      category = category,
+      datetime = System.currentTimeMillis(),
+      headline = "Sample Headline",
+      id = 1,
+      image = "https://sampleimage.com/image.jpg",
+      related = "MSFT",
+      source = "News Source 2",
+      summary = "This is a summary of the news article.",
+      url = "https://sampleurl.com/article"
+      )
     )
 
     `when`(apiClient.marketNews(category, minId)).thenReturn(apiResponse)
 
     // Act
-    val result = finnHubClient.getMarketNews(category, minId)
+    val result = finnHubClient.getMarketNewsList(category, minId)
 
     // Assert
     assertNotNull(result)
