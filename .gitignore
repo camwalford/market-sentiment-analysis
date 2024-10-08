@@ -2,6 +2,7 @@
 **/build/
 !src/**/build/
 
+finnhub-ingestion-service/.env
 .env
 
 # IntelliJ environment settings
