@@ -14,6 +14,7 @@ message MarketNewsResponse {
   string related = 6;
   int64 datetime = 7; // UNIX timestamp
   string image = 8;
+  int64 id = 9;
 }
 
 // Wrapper message for a list of Market News items
