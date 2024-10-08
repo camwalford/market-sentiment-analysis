@@ -16,7 +16,7 @@ import org.springframework.kafka.core.ProducerFactory
 @Configuration
 class KafkaConfig() {
 
-    @Value("\${kafka.bootstrap-servers}")
+    @Value("\${spring.kafka.bootstrap-servers}")
     private lateinit var bootstrapServers: String
 
     private val logger = LoggerFactory.getLogger(KafkaConfig::class.java)
