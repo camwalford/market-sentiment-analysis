@@ -1,9 +1,7 @@
 package me.camwalford.finnhubingestionservice.config
 
-
-import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
-import me.camwalford.finnhubingestionservice.model.protobuf.MarketNewsList
 import org.apache.kafka.clients.producer.ProducerConfig.*
+import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -20,20 +18,20 @@ class KafkaConfig() {
     private lateinit var bootstrapServers: String
 
     private val logger = LoggerFactory.getLogger(KafkaConfig::class.java)
-
+    //TODO: Look into schema registries
     @Bean
-    fun producerFactory(): ProducerFactory<String, MarketNewsList> {
+    fun producerFactory(): ProducerFactory<String, ByteArray> {
         val configProps = mapOf(
             BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
             KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-            VALUE_SERIALIZER_CLASS_CONFIG to KafkaProtobufSerializer::class.java
+            VALUE_SERIALIZER_CLASS_CONFIG to ByteArraySerializer::class.java
         )
         logger.info("Creating Kafka producer factory with config: $configProps")
         return DefaultKafkaProducerFactory(configProps)
     }
 
     @Bean
-    fun kafkaTemplate(): KafkaTemplate<String, MarketNewsList> {
+    fun kafkaTemplate(): KafkaTemplate<String, ByteArray> {
         return KafkaTemplate(producerFactory())
     }
 }

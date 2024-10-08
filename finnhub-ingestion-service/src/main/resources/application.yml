@@ -2,11 +2,12 @@
 
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}  # Externalized with default
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.KafkaProtobufSerializer
-
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      properties:
+        allow.auto.create.topics: true
 
 finnhub:
   api:
@@ -26,5 +27,6 @@ logging:
   level:
     root: INFO
     me.camwalford.finnhubingestionservice: DEBUG  # Adjust package name as needed
-
+    org.springframework.scheduling: DEBUG
+    me.camwalford.finnhubingestionservice.service.MarketNewsScheduler: DEBUG
 
