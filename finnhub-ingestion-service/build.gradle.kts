@@ -7,6 +7,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.4"
 	id("io.spring.dependency-management") version "1.1.6"
 	id("com.google.protobuf") version "0.9.4"
+
 }
 
 group = "me.camwalford"
@@ -38,6 +39,8 @@ dependencies {
 	implementation("io.finnhub:kotlin-client:2.0.20")
 	implementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
 	implementation ("io.confluent:kafka-protobuf-serializer:7.5.1")
+	implementation("org.springframework.retry:spring-retry")
+
 
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -46,6 +49,7 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 kotlin {
@@ -54,9 +58,18 @@ kotlin {
 	}
 }
 
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+tasks.test {
+	jvmArgs(
+		"-XX:+EnableDynamicAgentLoading",
+		"-Djdk.instrument.traceUsage=false"
+	)
+}
+
 
 protobuf {
 	protoc {
