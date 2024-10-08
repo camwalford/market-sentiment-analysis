@@ -17,16 +17,15 @@ object ProtobufConversionUtil {
             logger.info("Converting JSON to Protobuf for MarketNewsList")
             val dataArrayNode = objectMapper.readTree(jsonNewsList)
 
-            logger.info("Creating root node for Protobuf conversion")
             val rootNode = objectMapper.createObjectNode()
 
-            logger.info("Setting data node in root node {}", dataArrayNode)
+            logger.info("Setting data node in root node")
             rootNode.set<JsonNode>("data", dataArrayNode)
 
-            logger.info("Converting root node to JSON string: {}", rootNode)
+            logger.info("Converting root node to JSON string")
             val jsonString = objectMapper.writeValueAsString(rootNode)
 
-            logger.info("Parsing JSON to Protobuf: {}", jsonString)
+            logger.info("Parsing JSON to Protobuf")
             JsonFormat.parser().merge(jsonString, builder)
             builder.build()
         } catch (e: Exception) {
