@@ -4,7 +4,7 @@ import com.google.protobuf.util.JsonFormat
 import me.camwalford.finnhubingestionservice.model.protobuf.MarketNewsList
 import org.slf4j.LoggerFactory
 
-
+// TODO: Maybe rename MarketNewsList to ProtoMarketNewsList
 object ProtobufConversionUtil {
 
     private val logger = LoggerFactory.getLogger(ProtobufConversionUtil::class.java)

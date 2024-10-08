@@ -25,7 +25,7 @@ class MarketNewsProducerTest {
     val marketNewsList = MarketNewsList.newBuilder().build()
 
     // Act
-    marketNewsProducer.sendMarketNews(topic, key, marketNewsList)
+    marketNewsProducer.sendMarketNews(marketNewsList)
 
     // Assert
     verify(kafkaTemplate).send(topic, key, marketNewsList)
