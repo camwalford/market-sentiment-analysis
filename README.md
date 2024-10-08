@@ -1,4 +1,4 @@
-# Market Sentiment Analysis Project
+# Market Sentiment Analysis Project (WIP)
 
 This repository contains a set of microservices designed for market sentiment analysis using data ingestion from external APIs, data processing, sentiment analysis, and visualization on a web dashboard. The services are containerized and orchestrated using Docker Compose.
 
