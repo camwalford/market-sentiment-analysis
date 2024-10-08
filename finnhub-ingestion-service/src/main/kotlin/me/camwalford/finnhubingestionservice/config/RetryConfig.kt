@@ -14,8 +14,7 @@ class RetryConfig {
         val retryTemplate = RetryTemplate()
         val retryPolicy = SimpleRetryPolicy()
         retryPolicy.maxAttempts = 3
-        retryTemplate().setRetryPolicy(retryPolicy)
-
+        retryTemplate.setRetryPolicy(retryPolicy)
         return retryTemplate
 
     }
