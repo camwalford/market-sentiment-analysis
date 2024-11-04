@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: backend-api-service
+
+jwt:
+  key: ${JWT_KEY:secret}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
