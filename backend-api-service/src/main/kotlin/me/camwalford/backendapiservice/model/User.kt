@@ -14,7 +14,7 @@ data class User(
     val id: Long = -1,
 
     @Column(unique = true, nullable = false)
-    val username: String = "",
+    val email: String = "",
 
     @Column(nullable = false)
     val password: String = "", // Hashed with bcrypt
