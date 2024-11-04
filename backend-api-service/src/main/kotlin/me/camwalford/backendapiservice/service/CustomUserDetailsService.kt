@@ -17,7 +17,7 @@ class CustomUserDetailsService(
         userRepository.findByEmail(username)
             ?.mapToUserDetails()
             ?: throw UsernameNotFoundException("User not found")
-    }
+
 
     private fun ApplicationUser.mapToUserDetails(): UserDetails =
         User.builder()
