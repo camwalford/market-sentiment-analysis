@@ -28,5 +28,5 @@ logging:
     root: INFO
     me.camwalford.finnhubingestionservice: DEBUG  # Adjust package name as needed
     org.springframework.scheduling: DEBUG
-    me.camwalford.finnhubingestionservice.service.CompanyNewsScheduler: DEBUG
+    me.camwalford.finnhubingestionservice.service.CompanyNewsFetcher: DEBUG
 
