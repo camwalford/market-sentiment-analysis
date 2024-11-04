@@ -21,17 +21,17 @@ class MarketNewsSchedulerTest {
     private lateinit var finnHubService: FinnHubService
 
     @MockK
-    private lateinit var marketNewsProducer: MarketNewsProducer
+    private lateinit var companyNewsProducer: CompanyNewsProducer
 
     @MockK
     private lateinit var retryTemplate: RetryTemplate
 
-    private lateinit var marketNewsScheduler: MarketNewsScheduler
+    private lateinit var companyNewsScheduler: CompanyNewsScheduler
 
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
-        marketNewsScheduler = MarketNewsScheduler(finnHubService, marketNewsProducer, retryTemplate)
+        companyNewsScheduler = CompanyNewsScheduler(finnHubService, companyNewsProducer, retryTemplate)
     }
 
     @Test
@@ -43,14 +43,14 @@ class MarketNewsSchedulerTest {
             callbackSlot.captured.doWithRetry(RetryContextSupport())
         }
         every { finnHubService.fetchMarketNewsList() } returns marketNewsList
-        every { marketNewsProducer.sendMarketNews(marketNewsList) } returns Unit
+        every { companyNewsProducer.sendMarketNews(marketNewsList) } returns Unit
 
         // Act
-        marketNewsScheduler.fetchAndSendMarketNews()
+        companyNewsScheduler.fetchAndSendMarketNews()
 
         // Assert
         verify { finnHubService.fetchMarketNewsList() }
-        verify { marketNewsProducer.sendMarketNews(marketNewsList) }
+        verify { companyNewsProducer.sendMarketNews(marketNewsList) }
         verify { retryTemplate.execute(any<RetryCallback<Unit, Exception>>()) }
     }
 
@@ -70,7 +70,7 @@ class MarketNewsSchedulerTest {
 
         // Act & Assert
         try {
-            marketNewsScheduler.fetchAndSendMarketNews()
+            companyNewsScheduler.fetchAndSendMarketNews()
         } catch (e: Exception) {
             // Exception is rethrown after retries are exhausted
         }
@@ -94,18 +94,18 @@ class MarketNewsSchedulerTest {
             }
         }
         every { finnHubService.fetchMarketNewsList() } returns marketNewsList
-        every { marketNewsProducer.sendMarketNews(marketNewsList) } throws RuntimeException("Producer error")
+        every { companyNewsProducer.sendMarketNews(marketNewsList) } throws RuntimeException("Producer error")
 
         // Act & Assert
         try {
-            marketNewsScheduler.fetchAndSendMarketNews()
+            companyNewsScheduler.fetchAndSendMarketNews()
         } catch (e: Exception) {
             // Exception is rethrown after retries are exhausted
         }
 
         // Assert
         verify { finnHubService.fetchMarketNewsList() }
-        verify { marketNewsProducer.sendMarketNews(marketNewsList) }
+        verify { companyNewsProducer.sendMarketNews(marketNewsList) }
         verify { retryTemplate.execute(any<RetryCallback<Unit, Exception>>()) }
     }
 
