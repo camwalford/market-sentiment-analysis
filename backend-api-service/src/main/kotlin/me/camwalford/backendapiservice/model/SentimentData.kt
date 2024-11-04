@@ -22,11 +22,11 @@ data class SentimentData(
     val id: Long = 0,
 
     @Column(nullable = false)
-    val ticker: String,
+    val ticker: String = "",
 
     @Column(nullable = false)
-    val date: LocalDate,
+    val date: LocalDate = LocalDate.now(),
 
     @Column(nullable = false)
-    val sentiment: Double
+    val sentiment: Double = 0.0
 )
