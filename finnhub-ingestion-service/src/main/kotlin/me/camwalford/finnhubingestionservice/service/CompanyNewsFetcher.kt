@@ -1,7 +1,6 @@
 package me.camwalford.finnhubingestionservice.service
 
 
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.slf4j.LoggerFactory
 import org.springframework.retry.support.RetryTemplate
@@ -11,15 +10,14 @@ import java.time.format.DateTimeFormatter
 import java.time.ZoneOffset
 
 @Service
-class CompanyNewsScheduler(
+class CompanyNewsFetcher(
     private val finnHubService: FinnHubService,
     private val companyNewsProducer: CompanyNewsProducer,
     private val retryTemplate: RetryTemplate
 ) {
-    private val logger = LoggerFactory.getLogger(CompanyNewsScheduler::class.java)
+    private val logger = LoggerFactory.getLogger(CompanyNewsFetcher::class.java)
 
-    @Scheduled(fixedRate = 60000)
-    fun fetchAndSendCompanyNews() {
+    fun fetchAndSendCompanyNews(company: String) {
         retryTemplate.execute<Unit, Exception> {
             try {
                 // Calculate the current date in UTC and one year earlier
@@ -31,10 +29,14 @@ class CompanyNewsScheduler(
                 val toDateStr = currentDate.format(dateFormatter)
                 val fromDateStr = fromDate.format(dateFormatter)
 
-                logger.info("Fetching company news from FinnHubService and sending to Kafka")
+                logger.info("Fetching company news from FinnHubService and sending each item to Kafka")
                 val companyNewsList = finnHubService.fetchCompanyNewsList("AAPL", fromDateStr, toDateStr)
-                logger.info("Fetched company news data: $companyNewsList")
-                companyNewsProducer.sendCompanyNews(companyNewsList)
+
+                // Send each company news item individually
+                companyNewsList.forEach { newsItem ->
+                    logger.info("Sending individual company news item: $newsItem")
+                    companyNewsProducer.sendCompanyNews(newsItem, company)
+                }
             } catch (e: Exception) {
                 logger.error("Error occurred during fetchAndSendCompanyNews", e)
                 throw e
