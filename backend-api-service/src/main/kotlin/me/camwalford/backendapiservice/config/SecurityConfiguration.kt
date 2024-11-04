@@ -27,7 +27,7 @@ class SecurityConfiguration(
                 it
                     .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/auth/logout")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/user")
+                    .requestMatchers(HttpMethod.POST, "/api/user/register")
                     .permitAll()
                     .requestMatchers("/api/user**")
                     .hasRole("ADMIN")
