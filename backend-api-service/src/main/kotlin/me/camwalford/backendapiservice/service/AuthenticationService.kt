@@ -3,6 +3,8 @@ package me.camwalford.backendapiservice.service
 import me.camwalford.backendapiservice.config.JwtProperties
 import me.camwalford.backendapiservice.dto.AuthenticationRequest
 import me.camwalford.backendapiservice.dto.AuthenticationResponse
+import me.camwalford.backendapiservice.model.RefreshToken
+import me.camwalford.backendapiservice.model.User
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,23 +29,31 @@ class AuthenticationService(
         val user = userDetailsService.loadUserByUsername(authenticationRequest.email)
         val accessToken = createAccessToken(user)
         val refreshToken = createRefreshToken(user)
-        refreshTokenRepository.save(refreshToken, user)
+
+        // Save refresh token in the database
+        val refreshTokenEntity = RefreshToken(
+            token = refreshToken,
+            user = user as User
+        )
+        refreshTokenRepository.save(refreshTokenEntity)
+
         return AuthenticationResponse(
             accessToken = accessToken,
             refreshToken = refreshToken
         )
     }
+
     fun refreshAccessToken(refreshToken: String): String? {
-        val extractedEmail = tokenService.extractEmail(refreshToken)
-        return extractedEmail?.let { email ->
-            val currentUserDetails = userDetailsService.loadUserByUsername(email)
-            val refreshTokenUserDetails = refreshTokenRepository.findUserDetailsByToken(refreshToken)
-            if (!tokenService.isExpired(refreshToken) && refreshTokenUserDetails?.username == currentUserDetails.username)
-                createAccessToken(currentUserDetails)
-            else
-                null
+        val refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken) ?: return null
+        val user = refreshTokenEntity.user
+        val userDetails = userDetailsService.loadUserByUsername(user.email)
+        return if (!tokenService.isExpired(refreshToken)) {
+            createAccessToken(userDetails)
+        } else {
+            null
         }
     }
+
     private fun createAccessToken(user: UserDetails) = tokenService.generate(
         userDetails = user,
         expirationDate = getAccessTokenExpiration()

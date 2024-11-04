@@ -1,15 +1,12 @@
 package me.camwalford.backendapiservice.repository
 
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.stereotype.Component
+import me.camwalford.backendapiservice.model.RefreshToken
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
 
-@Component
-class RefreshTokenRepository {
-    private val tokens = mutableMapOf<String, UserDetails>()
-    fun findUserDetailsByToken(token: String) : UserDetails? =
-        tokens[token]
-    fun save(token: String, userDetails: UserDetails) {
-        tokens[token] = userDetails
-    }
+@Repository
+interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
+    fun findByToken(token: String): RefreshToken?
+    fun deleteByToken(token: String)
 }
