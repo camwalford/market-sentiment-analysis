@@ -5,19 +5,19 @@ package me.camwalford.finnhubingestionservice.model.protobuf;
 option java_multiple_files = true;
 
 // Message representing a single Market News item
-message MarketNewsResponse {
+message CompanyNewsProto {
   string category = 1;
-  string headline = 2;
-  string source = 3;
-  string summary = 4;
-  string url = 5;
+  int64 datetime = 2;  // UNIX timestamp
+  string headline = 3;
+  int64 id = 4;
+  string image = 5;
   string related = 6;
-  int64 datetime = 7; // UNIX timestamp
-  string image = 8;
-  int64 id = 9;
+  string source = 7;
+  string summary = 8;
+  string url = 9;
 }
 
 // Wrapper message for a list of Market News items
-message MarketNewsList {
-  repeated MarketNewsResponse data = 1;
+message CompanyNewsList {
+  repeated CompanyNewsProto data = 1;
 }

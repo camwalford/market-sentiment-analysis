@@ -15,9 +15,9 @@ finnhub:
 
 kafka:
   topic:
-    market-news: market-news-topic
+    company-news: company-news-topic
   key:
-    market-news: general
+    company-news: general
 
 
 
@@ -28,5 +28,5 @@ logging:
     root: INFO
     me.camwalford.finnhubingestionservice: DEBUG  # Adjust package name as needed
     org.springframework.scheduling: DEBUG
-    me.camwalford.finnhubingestionservice.service.MarketNewsScheduler: DEBUG
+    me.camwalford.finnhubingestionservice.service.CompanyNewsFetcher: DEBUG
 
