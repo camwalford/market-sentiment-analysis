@@ -1,6 +1,16 @@
 spring:
   application:
     name: backend-api-service
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:backend-api-service}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+      database-platform: org.hibernate.dialect.MySQL8Dialect
+      show-sql: true
+      generate-ddl: true
+
 
 jwt:
   key: ${JWT_KEY:secret}
