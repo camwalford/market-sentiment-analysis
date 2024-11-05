@@ -1,6 +1,6 @@
 // src/AuthProvider.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { login, refreshToken } from "./api";
+import { login, refreshToken, logout } from "./api"; // Import the logout function
 import AuthState from "./types/AuthState";
 import AuthContextType from "./types/AuthContextType"; // Import parseJwt
 
@@ -31,8 +31,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
 
-    const handleLogout = () => {
-        setAuth({ accessToken: null, refreshToken: null, user: null });
+    const handleLogout = async () => {
+        try {
+            if (auth.refreshToken) {
+                await logout(auth.refreshToken);
+            }
+        } catch (error) {
+            console.error("Logout failed:", error);
+            // Optionally, handle the error (e.g., show a notification)
+        } finally {
+            setAuth({ accessToken: null, refreshToken: null, user: null });
+            // Optionally, remove auth data from localStorage or perform other cleanup
+        }
     };
 
     const refreshAccessToken = async () => {

@@ -39,6 +39,20 @@ export async function login(email: string, password: string): Promise<LoginRespo
     return data;
 }
 
+export async function logout(refreshToken: string): Promise<void> {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: refreshToken }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Logout failed");
+    }else{
+        console.log("Logout successful")
+    }
+}
+
 export async function refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
     const response = await fetch(`${API_URL}/auth/refresh`, {
         method: "POST",
