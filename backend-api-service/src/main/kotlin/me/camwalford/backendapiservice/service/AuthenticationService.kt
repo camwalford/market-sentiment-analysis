@@ -4,8 +4,8 @@ import me.camwalford.backendapiservice.config.JwtProperties
 import me.camwalford.backendapiservice.dto.AuthenticationRequest
 import me.camwalford.backendapiservice.dto.AuthenticationResponse
 import me.camwalford.backendapiservice.model.RefreshToken
-import me.camwalford.backendapiservice.model.User
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository
+import me.camwalford.backendapiservice.repository.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
@@ -21,6 +21,7 @@ class AuthenticationService(
     private val tokenService: TokenService,
     private val jwtProperties: JwtProperties,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val userRepository: UserRepository // Add UserRepository to load ApplicationUser directly
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
@@ -32,14 +33,21 @@ class AuthenticationService(
                 authenticationRequest.password
             )
         )
-        val user = userDetailsService.loadUserByUsername(authenticationRequest.email)
-        val accessToken = createAccessToken(user)
-        val refreshToken = createRefreshToken(user)
 
-        // Save refresh token in the database
+        // Load UserDetails for token generation
+        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.email)
+
+        // Fetch the ApplicationUser from UserRepository to associate with RefreshToken
+        val applicationUser = userRepository.findByEmail(authenticationRequest.email)
+            ?: throw IllegalStateException("User not found in database")
+
+        val accessToken = createAccessToken(userDetails)
+        val refreshToken = createRefreshToken(userDetails)
+
+        // Save refresh token with ApplicationUser
         val refreshTokenEntity = RefreshToken(
             token = refreshToken,
-            user = user as User
+            user = applicationUser
         )
         refreshTokenRepository.save(refreshTokenEntity)
 
@@ -56,10 +64,12 @@ class AuthenticationService(
             logger.warn("Invalid refresh token: $refreshToken")
             return null
         }
-        val user = refreshTokenEntity.user
-        val userDetails = userDetailsService.loadUserByUsername(user.email)
+
+        // Load UserDetails for token generation
+        val userDetails = userDetailsService.loadUserByUsername(refreshTokenEntity.user.email)
+
         return if (!tokenService.isExpired(refreshToken)) {
-            logger.info("Refresh token is valid, generating new access token for user: ${user.email}")
+            logger.info("Refresh token is valid, generating new access token for user: ${refreshTokenEntity.user.email}")
             createAccessToken(userDetails)
         } else {
             logger.warn("Refresh token is expired: $refreshToken")
