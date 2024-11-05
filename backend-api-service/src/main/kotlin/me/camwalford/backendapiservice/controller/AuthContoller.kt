@@ -21,7 +21,7 @@ class AuthController(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthController::class.java)
 
-    @PostMapping
+    @PostMapping("/login")
     fun authenticate(@RequestBody authRequest: AuthenticationRequest): AuthenticationResponse {
         logger.info("Authenticating user with email: ${authRequest.email}")
         return authenticationService.authentication(authRequest)

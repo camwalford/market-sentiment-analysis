@@ -25,7 +25,7 @@ class SecurityConfiguration(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/auth/logout")
+                    .requestMatchers("/api/auth/login", "api/auth/refresh", "/error", "/api/auth/logout")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/user/register")
                     .permitAll()
