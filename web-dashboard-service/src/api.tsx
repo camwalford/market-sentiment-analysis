@@ -1,43 +1,42 @@
 // src/api.ts
 import {jwtDecode} from "jwt-decode";
+import LoginResponse from "./types/LoginResponse";
 
 const API_URL = "http://localhost:8080/api";
 
-type AuthResponse = {
-    accessToken: string;
-    refreshToken: string;
-};
 
-type UserData = {
-    email: string;
-    credits: number;
-    role: string;
-};
+// // Function to decode JWT and extract user data
+// export function parseJwt(accessToken: string): UserData | null {
+//     try {
+//         const decoded: any = jwtDecode(accessToken);
+//         console.log("Decoded JWT:", decoded);
+//         return {
+//             email: decoded.email,
+//             credits: decoded.credits,
+//             role: decoded.role,
+//         };
+//     } catch (error) {
+//         console.error("Failed to parse JWT:", error);
+//         return null;
+//     }
+// }
 
-// Function to decode JWT and extract user data
-export function parseJwt(accessToken: string): UserData | null {
-    try {
-        const decoded: any = jwtDecode(accessToken);
-        console.log("Decoded JWT:", decoded);
-        return {
-            email: decoded.email,
-            credits: decoded.credits,
-            role: decoded.role,
-        };
-    } catch (error) {
-        console.error("Failed to parse JWT:", error);
-        return null;
-    }
-}
-
-export async function login(email: string, password: string): Promise<AuthResponse> {
+export async function login(email: string, password: string): Promise<LoginResponse> {
     const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) throw new Error("Failed to login");
-    return response.json();
+
+    if (!response.ok) {
+        throw new Error("Login failed");
+    }
+
+    const data: LoginResponse = await response.json();
+    console.log("Login Response Data: " + data)
+
+    // Now data includes accessToken, refreshToken, and user
+    return data;
 }
 
 export async function refreshToken(refreshToken: string): Promise<{ accessToken: string }> {

@@ -1,24 +1,11 @@
 // src/AuthProvider.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { login, refreshToken, parseJwt } from "./api"; // Import parseJwt
+import { login, refreshToken } from "./api";
+import AuthState from "./types/AuthState";
+import AuthContextType from "./types/AuthContextType"; // Import parseJwt
 
-type UserData = {
-    email: string;
-    credits: number;
-    role: string;
-};
 
-type AuthState = {
-    accessToken: string | null;
-    refreshToken: string | null;
-    user: UserData | null;
-};
 
-type AuthContextType = {
-    auth: AuthState;
-    handleLogin: (email: string, password: string) => Promise<void>;
-    handleLogout: () => void;
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -31,14 +18,18 @@ export const useAuth = () => {
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [auth, setAuth] = useState<AuthState>({ accessToken: null, refreshToken: null, user: null });
 
+    // AuthProvider.tsx
+
     const handleLogin = async (email: string, password: string) => {
-        const { accessToken, refreshToken } = await login(email, password);
-
-        // Decode JWT to extract user data
-        const user = parseJwt(accessToken);
-
-        setAuth({ accessToken, refreshToken, user });
+        try {
+            const { accessToken, refreshToken, user } = await login(email, password);
+            setAuth({ accessToken, refreshToken, user });
+        } catch (error) {
+            console.error("Login failed:", error);
+            // Handle login error (e.g., show an error message to the user)
+        }
     };
+
 
     const handleLogout = () => {
         setAuth({ accessToken: null, refreshToken: null, user: null });
