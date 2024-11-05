@@ -3,6 +3,7 @@ package me.camwalford.backendapiservice.service
 import me.camwalford.backendapiservice.config.JwtProperties
 import me.camwalford.backendapiservice.dto.AuthenticationRequest
 import me.camwalford.backendapiservice.dto.AuthenticationResponse
+import me.camwalford.backendapiservice.dto.UserResponse
 import me.camwalford.backendapiservice.model.RefreshToken
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository
 import me.camwalford.backendapiservice.repository.UserRepository
@@ -34,10 +35,8 @@ class AuthenticationService(
             )
         )
 
-        // Load UserDetails for token generation
+        // Load UserDetails and ApplicationUser
         val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.email)
-
-        // Fetch the ApplicationUser from UserRepository to associate with RefreshToken
         val applicationUser = userRepository.findByEmail(authenticationRequest.email)
             ?: throw IllegalStateException("User not found in database")
 
@@ -51,10 +50,14 @@ class AuthenticationService(
         )
         refreshTokenRepository.save(refreshTokenEntity)
 
+        // Create UserResponse
+        val userResponse = UserResponse.toResponse(applicationUser)
+
         logger.info("User authenticated and tokens generated for email: ${authenticationRequest.email}")
         return AuthenticationResponse(
             accessToken = accessToken,
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            user = userResponse
         )
     }
 
