@@ -27,6 +27,11 @@ class UserService(
         return savedUser
     }
 
+    fun findByEmail(email: String): User? {
+        logger.info("Finding user with email: $email")
+        return userRepository.findByEmail(email)
+    }
+
     fun findById(id: Long): User? {
         logger.info("Finding user with id: $id")
         return userRepository.findById(id).orElse(null)

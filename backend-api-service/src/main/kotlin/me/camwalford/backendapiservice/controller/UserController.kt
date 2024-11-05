@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
+@CrossOrigin(origins = ["http://localhost:3000"])
 @RestController
 @RequestMapping("/api/user")
 class UserController(
@@ -29,6 +30,14 @@ class UserController(
     fun listAll(): List<UserResponse> {
         logger.info("Listing all users")
         return userService.findAll().map { UserResponse.toResponse(it) }
+    }
+
+    @GetMapping("/email/{email}")
+    fun findByEmail(@PathVariable email: String): UserResponse {
+        logger.info("Finding user with email: $email")
+        val user = userService.findByEmail(email)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
+        return UserResponse.toResponse(user)
     }
 
     @GetMapping("/{id}")
