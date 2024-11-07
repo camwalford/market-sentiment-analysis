@@ -1,0 +1,4 @@
+confluent-kafka
+transformers
+torch
+PyYAML
