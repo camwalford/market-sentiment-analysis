@@ -1,16 +1,32 @@
-// src/App.tsx
+// App.tsx
 import React from 'react';
-import { useAuth } from './AuthProvider';
-import Login from './Login';
-import Dashboard from './Dashboard';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import StockSentimentDashboard from './components/StockSentimentDashboard';
+import { AuthProvider } from './components/AuthProvider';
+import Register from './components/Register';
+import Login from './components/Login';
+import Header from './components/Header';
+import PrivateRoute from './components/PrivateRoute';
 
 const App: React.FC = () => {
-    const { auth } = useAuth(); // Will not throw error if wrapped in AuthProvider
-
     return (
-        <div>
-            {auth.accessToken ? <Dashboard /> : <Login />}
-        </div>
+        <AuthProvider>
+            <Header />
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                {/* Place the wildcard route last */}
+                <Route
+                    path="/"
+                    element={
+                        <PrivateRoute>
+                            <StockSentimentDashboard />
+                        </PrivateRoute>
+                    }
+                />
+                <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+        </AuthProvider>
     );
 };
 
