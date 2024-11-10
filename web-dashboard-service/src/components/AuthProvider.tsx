@@ -1,4 +1,4 @@
-import React, {createContext, ReactNode, useContext, useState} from "react";
+import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {BrowserRouter as Router, useNavigate} from "react-router-dom";
 
 
@@ -31,6 +31,8 @@ interface AuthContextType {
     handleLogout: () => Promise<void>;
     handleForgotPassword: (email: string) => Promise<void>;
     handleRegister: (email: string, password: string) => Promise<void>;
+    deductCredits: (amount: number) => void;
+    refreshAccessToken: () => Promise<string>;
 }
 
 // API Functions
@@ -97,6 +99,22 @@ export const useAuth = () => {
     return context;
 };
 
+async function getNewAccessToken(refreshToken: string): Promise<string> {
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to refresh access token");
+    }
+
+    const data = await response.json();
+    return data.accessToken;
+}
+
+
 // AuthProvider with Navigate
 const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [auth, setAuth] = useState<AuthState>({
@@ -106,6 +124,50 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         loading: false,
     });
     const navigate = useNavigate();
+
+    // Initialize auth state from localStorage
+    useEffect(() => {
+        const storedAccessToken = localStorage.getItem('accessToken');
+        const storedRefreshToken = localStorage.getItem('refreshToken');
+        const storedUser = localStorage.getItem('user');
+
+        if (storedAccessToken && storedRefreshToken && storedUser) {
+            setAuth({
+                accessToken: storedAccessToken,
+                refreshToken: storedRefreshToken,
+                user: JSON.parse(storedUser),
+                loading: false,
+            });
+        }
+    }, []);
+
+    const saveTokensToStorage = (accessToken: string, refreshToken: string, user: UserData) => {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(user));
+    };
+
+    const clearTokensFromStorage = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+    };
+
+    const deductCredits = (amount: number) => {
+        setAuth(prevAuth => {
+            const updatedUser = prevAuth.user
+                ? { ...prevAuth.user, credits: prevAuth.user.credits - amount }
+                : null;
+            // Update user in localStorage
+            if (updatedUser) {
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+            return {
+                ...prevAuth,
+                user: updatedUser,
+            };
+        });
+    };
 
     const handleLogin = async (email: string, password: string) => {
         setAuth(prev => ({ ...prev, loading: true }));
@@ -117,6 +179,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
                 user: response.user,
                 loading: false,
             });
+            saveTokensToStorage(response.accessToken, response.refreshToken, response.user);
             navigate('/');
         } catch (error) {
             setAuth(prev => ({ ...prev, loading: false }));
@@ -130,6 +193,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             if (auth.refreshToken) {
                 await logout(auth.refreshToken);
             }
+            clearTokensFromStorage();
             setAuth({
                 accessToken: null,
                 refreshToken: null,
@@ -166,6 +230,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
                 user: response.user,
                 loading: false,
             });
+            saveTokensToStorage(response.accessToken, response.refreshToken, response.user);
             navigate('/');
         } catch (error) {
             setAuth(prev => ({ ...prev, loading: false }));
@@ -173,8 +238,35 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         }
     };
 
+    const refreshAccessToken = async () => {
+        try {
+            if (!auth.refreshToken) throw new Error("No refresh token available");
+            const newAccessToken = await getNewAccessToken(auth.refreshToken);
+            setAuth((prevAuth) => ({
+                ...prevAuth,
+                accessToken: newAccessToken,
+            }));
+            localStorage.setItem("accessToken", newAccessToken);
+            return newAccessToken;
+        } catch (error) {
+            // If refresh fails, log out the user
+            await handleLogout();
+            throw error;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ auth, handleLogin, handleLogout, handleForgotPassword, handleRegister }}>
+        <AuthContext.Provider
+            value={{
+                auth,
+                handleLogin,
+                handleLogout,
+                handleForgotPassword,
+                handleRegister,
+                deductCredits,
+                refreshAccessToken,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

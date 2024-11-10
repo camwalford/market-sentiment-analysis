@@ -11,8 +11,9 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import { Search, Calendar } from 'lucide-react';
+import { useAuth } from './AuthProvider';
+import {useAuthFetch} from "./useAuthFetch";
 
-// Define the type for the data structure
 interface SentimentData {
     date: string;
     fullDate: string;
@@ -21,36 +22,6 @@ interface SentimentData {
     neutral: number;
     neutralLine: number;
 }
-
-// More realistic data generator with proper date handling
-const generateSampleData = (ticker: string, days: number): SentimentData[] => {
-    const data: SentimentData[] = [];
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days + 1);
-
-    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-        // Create more correlated data
-        const baseValue = Math.sin(date.getDate() / 7) * 20 + 60; // Creates a wave pattern
-        const positive = Math.floor(baseValue + Math.random() * 15);
-        const negative = Math.floor((80 - baseValue) + Math.random() * 15);
-        const neutral = Math.floor(Math.random() * 20 + 40);
-        const netSentiment = positive + negative; // Net sentiment calculation
-
-        data.push({
-            date: date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-            }),
-            fullDate: date.toISOString(),
-            positive,
-            negative: -negative,
-            neutral,
-            neutralLine: netSentiment, // Update to represent net sentiment
-        });
-    }
-    return data;
-};
 
 const TIME_PERIODS: { [key: string]: { days: number; label: string } } = {
     '7D': { days: 7, label: '7 Days' },
@@ -64,26 +35,87 @@ const StockSentimentDashboard: React.FC = () => {
     const [timePeriod, setTimePeriod] = useState<string>('7D');
     const [data, setData] = useState<SentimentData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { auth, deductCredits } = useAuth();
+    const fetchWithAuth = useAuthFetch();
 
-    // Effect to update data when time period changes
     useEffect(() => {
         updateData();
+
     }, [timePeriod]);
 
-    const updateData = () => {
+    const fetchSentiment = async (
+        ticker: string,
+        days: number
+    ): Promise<SentimentData[]> => {
+        const API_URL = 'http://localhost:8080/api';
+
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days + 1);
+
+        // Format dates to UTC ISO strings
+        const startDateUTC = startDate.toISOString();
+        const endDateUTC = endDate.toISOString();
+
+        try {
+            const response = await fetchWithAuth(`${API_URL}/sentiment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticker,
+                    startDate: startDateUTC,
+                    endDate: endDateUTC,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to fetch sentiment data');
+            }
+
+            const data = await response.json();
+
+            // Deduct one credit
+            deductCredits(1);
+
+            // Map the response data to the SentimentData[] type
+            const sentimentData: SentimentData[] = data.map((item: any) => ({
+                date: item.date,
+                fullDate: item.fullDate,
+                positive: item.positive,
+                negative: item.negative,
+                neutral: item.neutral,
+                neutralLine: item.netSentiment,
+            }));
+
+            return sentimentData;
+        } catch (error) {
+            console.error('Error fetching sentiment data:', error);
+            throw error;
+        }
+    };
+
+    const updateData = async () => {
         setIsLoading(true);
-        // Simulate API call delay
-        setTimeout(() => {
-            const newData = generateSampleData(ticker, TIME_PERIODS[timePeriod].days);
+        try {
+            const newData = await fetchSentiment(ticker, TIME_PERIODS[timePeriod].days);
             setData(newData);
+        } catch (error) {
+            console.error('Failed to update data:', error);
+            // Optionally, set an error state to display an error message to the user
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         updateData();
     };
+
+    // ... rest of your component (e.g., JSX rendering) ...
 
     interface CustomTooltipProps {
         active?: boolean;
@@ -156,7 +188,7 @@ const StockSentimentDashboard: React.FC = () => {
                             type="submit"
                             disabled={isLoading}
                             className={`px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
-                ${isLoading ? 'animate-pulse' : ''}`}
+              ${isLoading ? 'animate-pulse' : ''}`}
                         >
                             {isLoading ? 'Loading...' : 'Analyze'}
                         </button>
@@ -164,44 +196,52 @@ const StockSentimentDashboard: React.FC = () => {
                 </form>
 
                 <div className="h-[500px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart
-                            data={data}
-                            margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis
-                                dataKey="date"
-                                tick={{ fontSize: 12 }}
-                                interval={'preserveStartEnd'}
-                            />
-                            <YAxis
-                                domain={[-100, 100]}
-                                ticks={[-75, -50, -25, 0, 25, 50, 75, 100]}
-                                tickFormatter={(value: number) => `${Math.abs(value)}%`}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend />
-                            <Bar
-                                dataKey="positive"
-                                fill="rgba(74, 222, 128, 0.6)"
-                                name="Positive Sentiment"
-                            />
-                            <Bar
-                                dataKey="negative"
-                                fill="rgba(248, 113, 113, 0.6)"
-                                name="Negative Sentiment"
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="neutralLine"
-                                stroke="#000"
-                                strokeWidth={2}
-                                dot={false}
-                                name="Net Sentiment"
-                            />
-                        </ComposedChart>
-                    </ResponsiveContainer>
+                    {data.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart
+                                data={data}
+                                margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="date"
+                                    tick={{ fontSize: 12 }}
+                                    interval={'preserveStartEnd'}
+                                />
+                                <YAxis
+                                    domain={[-100, 100]}
+                                    ticks={[-75, -50, -25, 0, 25, 50, 75, 100]}
+                                    tickFormatter={(value: number) => `${Math.abs(value)}%`}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend />
+                                <Bar
+                                    dataKey="positive"
+                                    fill="rgba(74, 222, 128, 0.6)"
+                                    name="Positive Sentiment"
+                                />
+                                <Bar
+                                    dataKey="negative"
+                                    fill="rgba(248, 113, 113, 0.6)"
+                                    name="Negative Sentiment"
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="neutralLine"
+                                    stroke="#000"
+                                    strokeWidth={2}
+                                    dot={false}
+                                    name="Net Sentiment"
+                                />
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        !isLoading && (
+                            <div className="text-center text-gray-500">
+                                No data available. Please adjust your query.
+                            </div>
+                        )
+                    )}
                 </div>
 
                 <div className="mt-4">

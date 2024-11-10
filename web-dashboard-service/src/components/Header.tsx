@@ -14,9 +14,13 @@ const Header: React.FC = () => {
                 </div>
                 <h1 className="text-2xl font-bold tracking-wide">Stock Sentiment Dashboard</h1>
             </div>
-            {auth.accessToken && (
+            {auth.accessToken && auth.user && (
                 <div className="flex items-center space-x-4">
                     <FaUserCircle className="text-3xl" />
+                    <div className="flex flex-col items-start">
+                        <span className="text-sm font-semibold">{auth.user.email}</span>
+                        <span className="text-sm">Credits: {auth.user.credits}</span>
+                    </div>
                     <button
                         onClick={handleLogout}
                         className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 flex items-center space-x-2"
