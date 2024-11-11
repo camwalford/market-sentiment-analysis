@@ -1,6 +1,0 @@
-kafka:
-  bootstrap_servers: "localhost:9092"
-  consumer_topic: "company-news-topic"
-  producer_topic: "sentiment-analysis-results"
-  group_id: "sentiment-analysis-group"
-  auto_offset_reset: "earliest"

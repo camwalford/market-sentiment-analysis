@@ -1,4 +1,9 @@
-confluent-kafka
+fastapi
+uvicorn
+pydantic
 transformers
 torch
 PyYAML
+pytest
+httpx
+typing

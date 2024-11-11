@@ -1,5 +1,3 @@
 __pycache__/
 .env
 *.pyc
-data/logs/
-data/models/

@@ -1,7 +1,5 @@
-from src.model_loader import load_finbert_model
+from app.utils.model_loader import tokenizer, model, device
 import torch
-
-tokenizer, model, device = load_finbert_model()
 
 def analyze_sentiment(text):
     inputs = tokenizer(
