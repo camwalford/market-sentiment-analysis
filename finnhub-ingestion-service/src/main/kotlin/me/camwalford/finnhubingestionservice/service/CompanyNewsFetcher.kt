@@ -17,25 +17,25 @@ class CompanyNewsFetcher(
 ) {
     private val logger = LoggerFactory.getLogger(CompanyNewsFetcher::class.java)
 
-    fun fetchAndSendCompanyNews(company: String) {
+    fun fetchAndSendCompanyNews(ticker: String, fromDate: String, toDate: String) {
         retryTemplate.execute<Unit, Exception> {
             try {
                 // Calculate the current date in UTC and one year earlier
-                val currentDate = LocalDate.now(ZoneOffset.UTC)
-                val fromDate = currentDate.minusYears(1)
+//                val currentDate = LocalDate.now(ZoneOffset.UTC)
+//                val fromDate = currentDate.minusYears(1)
 
                 // Format the dates as strings
-                val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val toDateStr = currentDate.format(dateFormatter)
-                val fromDateStr = fromDate.format(dateFormatter)
+//                val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+//                val toDateStr = currentDate.format(dateFormatter)
+//                val fromDateStr = fromDate.format(dateFormatter)
 
                 logger.info("Fetching company news from FinnHubService and sending each item to Kafka")
-                val companyNewsList = finnHubService.fetchCompanyNewsList("AAPL", fromDateStr, toDateStr)
+                val companyNewsList = finnHubService.fetchCompanyNewsList(ticker, fromDate, toDate)
 
                 // Send each company news item individually
                 companyNewsList.forEach { newsItem ->
                     logger.info("Sending individual company news item: $newsItem")
-                    companyNewsProducer.sendCompanyNews(newsItem, company)
+                    companyNewsProducer.sendCompanyNews(newsItem, ticker)
                 }
             } catch (e: Exception) {
                 logger.error("Error occurred during fetchAndSendCompanyNews", e)

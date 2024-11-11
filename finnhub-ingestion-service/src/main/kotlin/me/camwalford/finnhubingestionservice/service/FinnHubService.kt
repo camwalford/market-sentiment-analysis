@@ -12,24 +12,18 @@ import org.springframework.stereotype.Service
 class FinnHubService(private val finnHubClient: FinnHubClient) {
 
     private val logger = LoggerFactory.getLogger(FinnHubService::class.java)
-    private val objectMapper = ObjectMapper()
 
-    fun fetchCompanyNewsList(company: String, from: String, to: String): List<CompanyNewsProto> {
+    fun fetchCompanyNewsList(company: String, from: String, to: String): List<CompanyNews> {
         logger.info("Fetching market news from FinnHubClient for company: $company, from: $from, to: $to")
         val companyNewsList = finnHubClient.getCompanyNewsList(company, from, to)
+        return companyNewsList
 
-        return try {
-            // Convert JSON list to individual Protobuf CompanyNewsProto objects
-            return companyNewsList.map { newsJson ->
-                val jsonString = objectMapper.writeValueAsString(newsJson)
-                ProtobufConversionUtil.convertCompanyNews(jsonString)
-            }.also {
-                logger.info("Successfully converted company news to individual Protobuf format")
-            }
-        } catch (e: Exception) {
-            logger.error("Failed to convert company news data to Protobuf", e)
-            throw RuntimeException("Failed to convert JSON to Protobuf", e)
-        }
+//        return try {
+//
+//        } catch (e: Exception) {
+//            logger.error("Failed to get company news list", e)
+//            throw RuntimeException("Failed to get company news list", e)
+//        }
     }
 }
 

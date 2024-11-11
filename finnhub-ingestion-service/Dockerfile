@@ -1,12 +1,16 @@
 ARG JAVA_VERSION=21
 FROM eclipse-temurin:${JAVA_VERSION}-jdk-alpine
 
-# Set the working directory inside the container
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
+COPY . .
+RUN ./gradlew clean build --no-daemon
 
-# Copy the built JAR file into the container
-COPY build/libs/*.jar app.jar
 
+# Stage 2: Run the application
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
 # Expose the application's port (if necessary)
 EXPOSE 8080
 
