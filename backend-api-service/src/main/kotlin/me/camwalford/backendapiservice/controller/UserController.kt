@@ -18,13 +18,7 @@ class UserController(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
-    @PostMapping("/register")
-    fun create(@RequestBody userRequest: UserRequest): UserResponse {
-        logger.info("Registering user with email: ${userRequest.email}")
-        val user = userService.createUser(userRequest.toModel())
-            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create user.")
-        return UserResponse.toResponse(user)
-    }
+
 
     @GetMapping
     fun listAll(): List<UserResponse> {

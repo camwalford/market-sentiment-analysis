@@ -15,7 +15,6 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                {/* Place the wildcard route last */}
                 <Route
                     path="/"
                     element={
