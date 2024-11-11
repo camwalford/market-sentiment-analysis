@@ -14,8 +14,8 @@ spring:
     compose:
       enabled: false # Set to true if you are using Docker Compose
 
-company:
-  news:
+finnhub:
+  ingestion:
     service:
       url: ${FINNHUB_INGESTION_SERVICE_URL:http://localhost:8081}
 
