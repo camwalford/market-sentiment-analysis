@@ -12,7 +12,7 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 # Expose the application's port (if necessary)
-EXPOSE 8080
+EXPOSE 8081
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

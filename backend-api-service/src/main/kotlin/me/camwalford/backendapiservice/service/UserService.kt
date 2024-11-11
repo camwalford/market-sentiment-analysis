@@ -20,6 +20,10 @@ class UserService(
             logger.warn("User with email ${user.email} already exists")
             return null
         }
+        if (userRepository.findUserByUsername(user.username) != null) {
+            logger.warn("User with username ${user.username} already exists")
+            return null
+        }
         val hashedPassword = passwordEncoder.encode(user.password)
         val userWithHashedPassword = user.copy(password = hashedPassword)
         val savedUser = userRepository.save(userWithHashedPassword)
@@ -30,6 +34,11 @@ class UserService(
     fun findByEmail(email: String): User? {
         logger.info("Finding user with email: $email")
         return userRepository.findByEmail(email)
+    }
+
+    fun findByUsername(username: String): User? {
+        logger.info("Finding user with username: $username")
+        return userRepository.findUserByUsername(username)
     }
 
     fun findById(id: Long): User? {
@@ -52,5 +61,13 @@ class UserService(
             logger.warn("User with id $id does not exist")
             false
         }
+    }
+
+    fun deductCredits(user: User, credits: Int): User {
+        logger.info("Deducting $credits credits from user with id: ${user.id}")
+        val updatedUser = user.copy(credits = user.credits - credits)
+        val savedUser = userRepository.save(updatedUser)
+        logger.info("Deducted $credits credits from user with id: ${user.id}")
+        return savedUser
     }
 }

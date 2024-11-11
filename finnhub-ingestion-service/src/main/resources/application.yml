@@ -8,7 +8,6 @@ spring:
         allow.auto.create.topics: true
 
 
-
 finnhub:
   api:
     apiKey: ${FINNHUB_API_KEY}  # Externalized, no default for security
@@ -27,3 +26,6 @@ logging:
     me.camwalford.finnhubingestionservice: DEBUG  # Adjust package name as needed
     org.springframework.scheduling: DEBUG
     me.camwalford.finnhubingestionservice.service.CompanyNewsFetcher: DEBUG
+
+server:
+  port: ${PORT:8081}

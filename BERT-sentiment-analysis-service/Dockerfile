@@ -10,8 +10,8 @@ COPY ../sentiment-analysis-service /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 9092 available to the world outside this container
-EXPOSE 9092
+# Make port 8092 available to the world outside this container
+EXPOSE 8082
 
 # Run main.py when the container launches
 CMD ["python", "src/main.py"]

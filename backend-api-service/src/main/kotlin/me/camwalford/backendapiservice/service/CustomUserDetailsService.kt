@@ -35,9 +35,9 @@ class CustomUserDetailsService(
     }
 
     private fun ApplicationUser.mapToUserDetails(): UserDetails {
-        logger.debug("Mapping ApplicationUser to UserDetails for user: ${this.email}")
+        logger.debug("Mapping ApplicationUser to UserDetails for user: ${this.username}")
         return User.builder()
-            .username(this.email)
+            .username(this.username)
             .password(this.password)
             .authorities(this.role.name)
             .build()

@@ -11,7 +11,7 @@ def test_analyze_company_news_invalid_input(client):
         }
     ]
 
-    response = client.post("/analyze", json=invalid_data)
+    response = client.post("/analyze-list", json=invalid_data)
     assert response.status_code == 200  # Depending on your implementation
 
     results = response.json()
