@@ -1,6 +1,7 @@
 package me.camwalford.backendapiservice.service
 
 import me.camwalford.backendapiservice.repository.UserRepository
+import org.apache.kafka.common.security.scram.internals.ScramFormatter.username
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.User
@@ -19,7 +20,7 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(username: String): UserDetails {
         logger.info("Loading user by username: $username")
-        val user = userRepository.findByEmail(username)
+        val user = userRepository.findUserByUsername(username)
             ?.mapToUserDetails()
             ?: run {
                 logger.warn("User not found with username: $username")

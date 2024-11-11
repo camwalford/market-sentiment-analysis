@@ -30,5 +30,5 @@ data class User(
 )
 
 enum class Role {
-    USER, ADMIN
+    USER, ADMIN, BANNED
 }
