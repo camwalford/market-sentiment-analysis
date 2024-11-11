@@ -26,7 +26,7 @@ class SecurityConfiguration(
     ): DefaultSecurityFilterChain {
         http
             .csrf { it.disable() }
-            .cors { it.configurationSource(corsConfigurationSource()) }  // Ensure CORS is enabled globally
+            .cors { it.disable() }
             .authorizeHttpRequests {
                 it
                     // Allow all OPTIONS requests for CORS preflight
@@ -37,7 +37,7 @@ class SecurityConfiguration(
                     .requestMatchers(HttpMethod.POST, "/api/auth/register")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
-                    .hasAnyRole("USER", "ADMIN")
+                    .permitAll()
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
                     .anyRequest()
@@ -56,7 +56,7 @@ class SecurityConfiguration(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("http://localhost:3000")  // Allow your frontend origin
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
         configuration.allowCredentials = true
 

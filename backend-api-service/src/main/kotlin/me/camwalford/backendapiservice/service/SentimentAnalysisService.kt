@@ -14,7 +14,7 @@ class SentimentAnalysisService(
 ) {
     suspend fun analyzeSentiment(newsArticles: List<CompanyNews>): List<SentimentResult> {
         return webClient.post()
-            .uri("$sentimentAnalysisServiceUrl/analyze")
+            .uri("$sentimentAnalysisServiceUrl/analyze-list")
             .bodyValue(newsArticles)
             .retrieve()
             .onStatus({ it.isError }) {

@@ -10,7 +10,7 @@ spring:
 
 finnhub:
   api:
-    apiKey: ${FINNHUB_API_KEY}  # Externalized, no default for security
+    apiKey: ${FINNHUB_API_KEY:cs1g4hhr01qsperu9s40cs1g4hhr01qsperu9s4g}  # Externalized, no default for security
 
 kafka:
 

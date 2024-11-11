@@ -22,7 +22,7 @@ class CompanyNewsService(
             .bodyValue(request)  // Pass request body as JSON
             .retrieve()
             .onStatus({ it.isError }) {
-                throw RuntimeException("Error fetching news from FinnHub Ingestion Service")
+                throw RuntimeException("Error fetching news from FinnHub Ingestion Service" + it.statusCode())
             }
             .awaitBody()  // Asynchronously await response and parse it as List<CompanyNews>
     }

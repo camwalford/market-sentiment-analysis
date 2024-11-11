@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import me.camwalford.backendapiservice.model.User
 import me.camwalford.backendapiservice.repository.UserRepository
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -63,11 +64,13 @@ class UserService(
         }
     }
 
-    fun deductCredits(user: User, credits: Int): User {
-        logger.info("Deducting $credits credits from user with id: ${user.id}")
-        val updatedUser = user.copy(credits = user.credits - credits)
-        val savedUser = userRepository.save(updatedUser)
-        logger.info("Deducted $credits credits from user with id: ${user.id}")
-        return savedUser
+    @Transactional
+    fun deductCredits(user: User, amount: Int) {
+        logger.info("Deducting $amount credits from user with id: ${user.id}")
+        if (user.credits < amount) {
+            throw Exception("User does not have enough credits")
+        }
+        user.credits -= amount
+        userRepository.save(user)
     }
 }
