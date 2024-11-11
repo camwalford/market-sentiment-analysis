@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
     ComposedChart,
     Bar,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -12,15 +11,14 @@ import {
 } from 'recharts';
 import { Search, Calendar } from 'lucide-react';
 import { useAuth } from './AuthProvider';
-import {useAuthFetch} from "./useAuthFetch";
+import { useAuthFetch } from './useAuthFetch';
 
 interface SentimentData {
     date: string;
-    fullDate: string;
-    positive: number;
-    negative: number;
-    neutral: number;
-    neutralLine: number;
+    sentiment: string; // 'positive', 'negative', 'neutral'
+    confidence: number;
+    ticker: string;
+    id: number;
 }
 
 const TIME_PERIODS: { [key: string]: { days: number; label: string } } = {
@@ -34,28 +32,30 @@ const StockSentimentDashboard: React.FC = () => {
     const [ticker, setTicker] = useState<string>('AAPL');
     const [timePeriod, setTimePeriod] = useState<string>('7D');
     const [data, setData] = useState<SentimentData[]>([]);
+    const [chartData, setChartData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { auth, deductCredits } = useAuth();
     const fetchWithAuth = useAuthFetch();
 
     useEffect(() => {
         updateData();
-
     }, [timePeriod]);
+
+    useEffect(() => {
+        transformDataForChart();
+    }, [data]);
 
     const fetchSentiment = async (
         ticker: string,
         days: number
     ): Promise<SentimentData[]> => {
         const API_URL = 'http://localhost:8080/api';
+        const toDate = new Date();
+        const fromDate = new Date();
+        fromDate.setDate(fromDate.getDate() - days + 1);
 
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - days + 1);
-
-        // Format dates to UTC ISO strings
-        const startDateUTC = startDate.toISOString();
-        const endDateUTC = endDate.toISOString();
+        const fromDateUTC = fromDate.toISOString();
+        const toDateUTC = toDate.toISOString();
 
         try {
             const response = await fetchWithAuth(`${API_URL}/sentiment`, {
@@ -65,8 +65,8 @@ const StockSentimentDashboard: React.FC = () => {
                 },
                 body: JSON.stringify({
                     ticker,
-                    startDate: startDateUTC,
-                    endDate: endDateUTC,
+                    fromDate: fromDateUTC,
+                    toDate: toDateUTC,
                 }),
             });
 
@@ -76,18 +76,14 @@ const StockSentimentDashboard: React.FC = () => {
             }
 
             const data = await response.json();
-
-            // Deduct one credit
             deductCredits(1);
 
-            // Map the response data to the SentimentData[] type
             const sentimentData: SentimentData[] = data.map((item: any) => ({
                 date: item.date,
-                fullDate: item.fullDate,
-                positive: item.positive,
-                negative: item.negative,
-                neutral: item.neutral,
-                neutralLine: item.netSentiment,
+                sentiment: item.sentiment,
+                confidence: item.confidence,
+                ticker: item.ticker,
+                id: item.id,
             }));
 
             return sentimentData;
@@ -104,10 +100,26 @@ const StockSentimentDashboard: React.FC = () => {
             setData(newData);
         } catch (error) {
             console.error('Failed to update data:', error);
-            // Optionally, set an error state to display an error message to the user
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const transformDataForChart = () => {
+        const groupedData = data.reduce((acc, item) => {
+            const date = item.date;
+            if (!acc[date]) {
+                acc[date] = { date, positive: 0, neutral: 0, negative: 0 };
+            }
+
+            // Cast item.sentiment to ensure TypeScript knows it's a key in the object
+            const sentimentKey = item.sentiment as 'positive' | 'neutral' | 'negative';
+
+            acc[date][sentimentKey] += 1;
+            return acc;
+        }, {} as Record<string, { date: string; positive: number; neutral: number; negative: number }>);
+
+        setChartData(Object.values(groupedData));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -115,27 +127,19 @@ const StockSentimentDashboard: React.FC = () => {
         updateData();
     };
 
-    // ... rest of your component (e.g., JSX rendering) ...
-
-    interface CustomTooltipProps {
-        active?: boolean;
-        payload?: any;
-        label?: string;
-    }
-
-    const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
+    const CustomTooltip: React.FC<{ active?: boolean; payload?: any; label?: string }> = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-4 border rounded shadow">
                     <p className="text-sm font-bold mb-2">{label}</p>
                     <p className="text-sm text-green-600 flex justify-between">
-                        <span>Positive:</span> <span className="ml-4 font-semibold">{payload[0].value}%</span>
-                    </p>
-                    <p className="text-sm text-red-600 flex justify-between">
-                        <span>Negative:</span> <span className="ml-4 font-semibold">{Math.abs(payload[1].value)}%</span>
+                        <span>Positive:</span> <span className="ml-4 font-semibold">{payload[0].value}</span>
                     </p>
                     <p className="text-sm text-gray-600 flex justify-between">
-                        <span>Net Sentiment:</span> <span className="ml-4 font-semibold">{payload[2].value}%</span>
+                        <span>Neutral:</span> <span className="ml-4 font-semibold">{payload[1].value}</span>
+                    </p>
+                    <p className="text-sm text-red-600 flex justify-between">
+                        <span>Negative:</span> <span className="ml-4 font-semibold">{payload[2].value}</span>
                     </p>
                 </div>
             );
@@ -196,43 +200,17 @@ const StockSentimentDashboard: React.FC = () => {
                 </form>
 
                 <div className="h-[500px] w-full">
-                    {data.length > 0 ? (
+                    {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart
-                                data={data}
-                                margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
-                            >
+                            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 50, bottom: 20 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis
-                                    dataKey="date"
-                                    tick={{ fontSize: 12 }}
-                                    interval={'preserveStartEnd'}
-                                />
-                                <YAxis
-                                    domain={[-100, 100]}
-                                    ticks={[-75, -50, -25, 0, 25, 50, 75, 100]}
-                                    tickFormatter={(value: number) => `${Math.abs(value)}%`}
-                                />
+                                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                                <YAxis allowDecimals={false} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend />
-                                <Bar
-                                    dataKey="positive"
-                                    fill="rgba(74, 222, 128, 0.6)"
-                                    name="Positive Sentiment"
-                                />
-                                <Bar
-                                    dataKey="negative"
-                                    fill="rgba(248, 113, 113, 0.6)"
-                                    name="Negative Sentiment"
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="neutralLine"
-                                    stroke="#000"
-                                    strokeWidth={2}
-                                    dot={false}
-                                    name="Net Sentiment"
-                                />
+                                <Bar dataKey="positive" fill="rgba(74, 222, 128, 0.6)" name="Positive Sentiment" />
+                                <Bar dataKey="neutral" fill="rgba(156, 163, 175, 0.6)" name="Neutral Sentiment" />
+                                <Bar dataKey="negative" fill="rgba(248, 113, 113, 0.6)" name="Negative Sentiment" />
                             </ComposedChart>
                         </ResponsiveContainer>
                     ) : (
@@ -242,27 +220,6 @@ const StockSentimentDashboard: React.FC = () => {
                             </div>
                         )
                     )}
-                </div>
-
-                <div className="mt-4">
-                    <h2 className="text-lg font-semibold mb-2">Summary</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {['Positive', 'Negative', 'Neutral'].map((type) => (
-                            <div key={type} className="bg-gray-50 p-4 rounded-lg">
-                                <h3 className="text-sm font-medium text-gray-500">{type} Sentiment Average</h3>
-                                <p className="text-2xl font-bold">
-                                    {Math.round(
-                                        data.reduce((acc, curr) => {
-                                            const value = type === 'Negative'
-                                                ? Math.abs(curr[type.toLowerCase() as keyof SentimentData] as number)
-                                                : curr[type === 'Neutral' ? 'neutralLine' : type.toLowerCase() as keyof SentimentData] as number;
-                                            return acc + value;
-                                        }, 0) / Math.max(data.length, 1)
-                                    )}%
-                                </p>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </div>
         </div>
