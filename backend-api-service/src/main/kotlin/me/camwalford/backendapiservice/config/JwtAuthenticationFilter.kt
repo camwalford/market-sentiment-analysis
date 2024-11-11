@@ -35,16 +35,21 @@ class JwtAuthenticationFilter(
 
         val jwtToken = authHeader!!.extractTokenValue()
         val email = tokenService.extractEmail(jwtToken)
+        val username = tokenService.extractUsername(jwtToken)
 
-        if (email == null) {
+        if (username == null) {
             logger.info("JWT does not contain a valid email.")
         } else {
-            logger.info("Extracted email from JWT: $email")
+            logger.info("Extracted email from JWT: $username")
         }
-
-        if (email != null && SecurityContextHolder.getContext().authentication == null) {
-            logger.info("Security context has no authentication. Loading user details for: $email")
-            val foundUser = userDetailsService.loadUserByUsername(email)
+        if (SecurityContextHolder.getContext().authentication == null){
+            logger.info("Security context has no authentication.")
+        } else {
+            logger.info("Security context already contains authentication.")
+        }
+        if (username != null && SecurityContextHolder.getContext().authentication == null) {
+            logger.info("Security context has no authentication. Loading user details for: $username")
+            val foundUser = userDetailsService.loadUserByUsername(username)
 
             if (tokenService.isValid(jwtToken, foundUser)) {
                 logger.info("JWT token is valid for user: ${foundUser.username}. Updating security context.")

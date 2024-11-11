@@ -15,7 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 class SecurityConfiguration(
     private val authenticationProvider: AuthenticationProvider
 ) {
@@ -37,7 +37,7 @@ class SecurityConfiguration(
                     .requestMatchers(HttpMethod.POST, "/api/auth/register")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
-                    .permitAll()
+                    .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
                     .anyRequest()
@@ -56,7 +56,7 @@ class SecurityConfiguration(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("http://localhost:3000")  // Allow your frontend origin
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
         configuration.allowCredentials = true
 

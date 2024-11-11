@@ -28,10 +28,10 @@ class SentimentController(
 
 
     @PostMapping
-    suspend fun getSentiment(
+    fun getSentiment(
         @AuthenticationPrincipal userDetails: UserDetails?,
         @RequestBody request: SentimentRequest
-    ): ResponseEntity<SentimentResponse> = withContext(SecurityContextElement(SecurityContextHolder.getContext())) {
+    ): ResponseEntity<SentimentResponse> {
         if (userDetails == null) {
             logger.warn("User not authenticated")
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated")
@@ -64,22 +64,24 @@ class SentimentController(
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sentiment analysis failed.")
         }
 
-//        // Step 5: Deduct User Credits
-//        try {
-//            userService.deductCredits(user, 1)
-//        } catch (ex: Exception) {
-//            logger.error("Failed to deduct user credits: ${ex.message}")
-//            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deduct user credits.")
-//        }
+        // Step 5: Deduct User Credits
+        try {
+            userService.deductCredits(user, 1)
+        } catch (ex: Exception) {
+            logger.error("Failed to deduct user credits: ${ex.message}")
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to deduct user credits.")
+        }
 
         // Step 6: Return Sentiment Analysis Results in the Response
         val response = SentimentResponse(results = sentimentResults, creditsRemaining = user.credits)
         logger.info("Successfully processed sentiment request for ticker: ${request.ticker}")
         logger.info("User ${userDetails.username} now has ${user.credits} credits remaining")
         logger.info("Returning response: $response")
+        val responseEntity = ResponseEntity.ok(response)
+        logger.info("Returning response entity: $responseEntity")
 
         // Remove 'return' and make this the last expression
-        ResponseEntity.ok(response)
+        return responseEntity
     }
 
 

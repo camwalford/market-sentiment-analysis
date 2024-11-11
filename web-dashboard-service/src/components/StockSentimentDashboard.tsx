@@ -57,10 +57,6 @@ const StockSentimentDashboard: React.FC = () => {
     const fetchWithAuth = useAuthFetch();
 
     useEffect(() => {
-        updateData();
-    }, [timePeriod]);
-
-    useEffect(() => {
         transformDataForChart();
     }, [data, grouping]);
 

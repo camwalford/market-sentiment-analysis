@@ -5,25 +5,19 @@ import me.camwalford.backendapiservice.dto.SentimentRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.awaitBody
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Service
 class CompanyNewsService(
     private val webClient: WebClient,
-
-    // Base URL for the FinnHub ingestion service (configured via environment variable)
-    @Value("\${finnhub.ingestion.service.url}")
-    private val finnHubIngestionServiceUrl: String
+    @Value("\${finnhub.ingestion.service.url}") private val companyNewsServiceUrl: String
 ) {
-
-    suspend fun fetchCompanyNews(request: SentimentRequest): List<CompanyNews> {
+    fun fetchCompanyNews(request: SentimentRequest): List<CompanyNews> {
         return webClient.post()
-            .uri("$finnHubIngestionServiceUrl/finnhub/company-news/list")  // Set the complete URL including endpoint
-            .bodyValue(request)  // Pass request body as JSON
+            .uri("$companyNewsServiceUrl/finnhub/company-news/list")
+            .bodyValue(request)
             .retrieve()
-            .onStatus({ it.isError }) {
-                throw RuntimeException("Error fetching news from FinnHub Ingestion Service" + it.statusCode())
-            }
-            .awaitBody()  // Asynchronously await response and parse it as List<CompanyNews>
+            .bodyToMono<List<CompanyNews>>()
+            .block() ?: throw RuntimeException("Error in Company News Service")
     }
 }
