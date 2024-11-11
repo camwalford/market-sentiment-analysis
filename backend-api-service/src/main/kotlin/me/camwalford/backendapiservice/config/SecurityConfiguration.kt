@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.DefaultSecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @Configuration
@@ -23,13 +26,19 @@ class SecurityConfiguration(
     ): DefaultSecurityFilterChain {
         http
             .csrf { it.disable() }
+            .cors { it.configurationSource(corsConfigurationSource()) }  // Ensure CORS is enabled globally
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth/login", "api/auth/refresh", "/error", "/api/auth/logout")
+                    // Allow all OPTIONS requests for CORS preflight
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                    .requestMatchers("/api/auth/login", "/api/auth/refresh", "/error", "/api/auth/logout")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/user/register")
+                    .requestMatchers(HttpMethod.POST, "/api/auth/register")
                     .permitAll()
-                    .requestMatchers("/api/user**")
+                    .requestMatchers(HttpMethod.POST, "/api/sentiment")
+                    .hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
                     .anyRequest()
                     .fullyAuthenticated()
@@ -39,6 +48,20 @@ class SecurityConfiguration(
             }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+
         return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf("http://localhost:3000")  // Allow your frontend origin
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
+        configuration.allowCredentials = true
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }

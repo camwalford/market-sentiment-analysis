@@ -24,7 +24,7 @@ class SentimentController(
     private val logger = LoggerFactory.getLogger(SentimentController::class.java)
 
     @PostMapping
-    suspend fun getSentimentFromTo(
+    suspend fun getSentiment(
         @AuthenticationPrincipal userDetails: UserDetails,
         @RequestBody request: SentimentRequest
     ): ResponseEntity<SentimentResponse> {
