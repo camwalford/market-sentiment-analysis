@@ -2,8 +2,6 @@ package me.camwalford.backendapiservice.service
 
 import me.camwalford.backendapiservice.dto.CompanyNews
 import me.camwalford.backendapiservice.dto.SentimentRequest
-import me.camwalford.backendapiservice.model.CompanyNews
-import me.camwalford.backendapiservice.model.CompanyNewsRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
