@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
     const { handleRegister, auth } = useAuth();
+    const [username, setUsername] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
@@ -14,7 +15,7 @@ const Register: React.FC = () => {
         setError("");
 
         try {
-            await handleRegister(email, password);
+            await handleRegister(username, email, password);
             navigate('/');
         } catch (error) {
             if (error instanceof Error) {
@@ -51,7 +52,22 @@ const Register: React.FC = () => {
                         </div>
                     )}
 
+
                     <div className="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label htmlFor="username" className="sr-only">Username</label>
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                autoComplete="username"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                placeholder="Username"
+                            />
+                        </div>
                         <div>
                             <label htmlFor="email" className="sr-only">Email address</label>
                             <input
@@ -62,7 +78,7 @@ const Register: React.FC = () => {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 placeholder="Email address"
                             />
                         </div>

@@ -5,7 +5,7 @@ import {useAuth} from "./AuthProvider";
 
 const Login: React.FC = () => {
     const { handleLogin, handleForgotPassword, auth } = useAuth();
-    const [email, setEmail] = useState<string>("");
+    const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [isResetMode, setIsResetMode] = useState(false);
@@ -17,10 +17,10 @@ const Login: React.FC = () => {
 
         try {
             if (isResetMode) {
-                await handleForgotPassword(email);
+                await handleForgotPassword(username);
                 setResetSuccess(true);
             } else {
-                await handleLogin(email, password);
+                await handleLogin(username, password);
             }
         } catch (error) {
             if (error instanceof Error) {
@@ -78,17 +78,17 @@ const Login: React.FC = () => {
 
                         <div className="rounded-md shadow-sm -space-y-px">
                             <div>
-                                <label htmlFor="email" className="sr-only">Email address</label>
+                                <label htmlFor="username" className="sr-only">Username</label>
                                 <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
+                                    id="username"
+                                    name="username"
+                                    type="username"
+                                    autoComplete="username"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                    placeholder="Email address"
+                                    placeholder="Username"
                                 />
                             </div>
                             {!isResetMode && (
