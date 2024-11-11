@@ -27,17 +27,17 @@ class AuthenticationService(
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
     fun authentication(authenticationRequest: AuthenticationRequest): AuthenticationResponse {
-        logger.info("Authenticating user with email: ${authenticationRequest.email}")
+        logger.info("Authenticating user with username: ${authenticationRequest.username}")
         authManager.authenticate(
             UsernamePasswordAuthenticationToken(
-                authenticationRequest.email,
+                authenticationRequest.username,
                 authenticationRequest.password
             )
         )
 
         // Load UserDetails and ApplicationUser
-        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.email)
-        val applicationUser = userRepository.findByEmail(authenticationRequest.email)
+        val userDetails = userDetailsService.loadUserByUsername(authenticationRequest.username)
+        val applicationUser = userRepository.findUserByUsername(authenticationRequest.username)
             ?: throw IllegalStateException("User not found in database")
 
         val accessToken = createAccessToken(userDetails)
@@ -53,7 +53,7 @@ class AuthenticationService(
         // Create UserResponse
         val userResponse = UserResponse.toResponse(applicationUser)
 
-        logger.info("User authenticated and tokens generated for email: ${authenticationRequest.email}")
+        logger.info("User authenticated and tokens generated for username: ${authenticationRequest.username}")
         return AuthenticationResponse(
             accessToken = accessToken,
             refreshToken = refreshToken,
@@ -69,10 +69,10 @@ class AuthenticationService(
         }
 
         // Load UserDetails for token generation
-        val userDetails = userDetailsService.loadUserByUsername(refreshTokenEntity.user.email)
+        val userDetails = userDetailsService.loadUserByUsername(refreshTokenEntity.user.username)
 
         return if (!tokenService.isExpired(refreshToken)) {
-            logger.info("Refresh token is valid, generating new access token for user: ${refreshTokenEntity.user.email}")
+            logger.info("Refresh token is valid, generating new access token for user: ${refreshTokenEntity.user.username}")
             createAccessToken(userDetails)
         } else {
             logger.warn("Refresh token is expired: $refreshToken")

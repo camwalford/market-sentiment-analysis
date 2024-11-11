@@ -30,17 +30,17 @@ interface AuthContextType {
     handleLogin: (email: string, password: string) => Promise<void>;
     handleLogout: () => Promise<void>;
     handleForgotPassword: (email: string) => Promise<void>;
-    handleRegister: (email: string, password: string) => Promise<void>;
+    handleRegister: (username: string, email: string, password: string) => Promise<void>;
     deductCredits: (amount: number) => void;
     refreshAccessToken: () => Promise<string>;
 }
 
 // API Functions
-async function register(email: string, password: string): Promise<void> {
+async function register(username:string, email: string, password: string): Promise<void> {
     const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({username, email, password }),
     });
 
     if (!response.ok) {
@@ -50,11 +50,11 @@ async function register(email: string, password: string): Promise<void> {
 }
 
 // API Functions
-async function login(email: string, password: string): Promise<LoginResponse> {
+async function login(username: string, password: string): Promise<LoginResponse> {
     const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
     });
 
     if (!response.ok) {
@@ -169,10 +169,10 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         });
     };
 
-    const handleLogin = async (email: string, password: string) => {
+    const handleLogin = async (username: string, password: string) => {
         setAuth(prev => ({ ...prev, loading: true }));
         try {
-            const response = await login(email, password);
+            const response = await login(username, password);
             setAuth({
                 accessToken: response.accessToken,
                 refreshToken: response.refreshToken,
@@ -218,10 +218,10 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         }
     };
 
-    const handleRegister = async (email: string, password: string) => {
+    const handleRegister = async (username: string, email: string, password: string) => {
         setAuth(prev => ({ ...prev, loading: true }));
         try {
-            await register(email, password);
+            await register(username, email, password);
             // After successful registration, automatically log them in
             const response = await login(email, password);
             setAuth({
