@@ -33,6 +33,7 @@ interface AuthContextType {
     handleRegister: (username: string, email: string, password: string) => Promise<void>;
     deductCredits: (amount: number) => void;
     refreshAccessToken: () => Promise<string>;
+    setCredits: (newCredits: number) => void;
 }
 
 // API Functions
@@ -255,6 +256,17 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         }
     };
 
+    const setCredits = (newCredits: number) => {
+        setAuth((prevAuth) => {
+            const updatedUser = prevAuth.user ? { ...prevAuth.user, credits: newCredits } : null;
+            if (updatedUser) {
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+            }
+            return { ...prevAuth, user: updatedUser };
+        });
+    };
+
+
     return (
         <AuthContext.Provider
             value={{
@@ -265,6 +277,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
                 handleRegister,
                 deductCredits,
                 refreshAccessToken,
+                setCredits // Add setCredits to the provider value
             }}
         >
             {children}

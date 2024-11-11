@@ -53,7 +53,7 @@ const StockSentimentDashboard: React.FC = () => {
     const [data, setData] = useState<SentimentData[]>([]);
     const [chartData, setChartData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { auth, deductCredits } = useAuth();
+    const { auth, deductCredits, setCredits } = useAuth();
     const fetchWithAuth = useAuthFetch();
 
     useEffect(() => {
@@ -91,8 +91,9 @@ const StockSentimentDashboard: React.FC = () => {
             }
 
             const responseData: SentimentResponse = await response.json();
-            // Update the credits remaining in your auth context if necessary
-            // For example: setAuth({ ...auth, creditsRemaining: responseData.creditsRemaining });
+
+            // Update credits in AuthContext
+            setCredits(responseData.creditsRemaining);
 
             const sentimentData: SentimentData[] = responseData.results.map((item) => ({
                 date: item.date,
