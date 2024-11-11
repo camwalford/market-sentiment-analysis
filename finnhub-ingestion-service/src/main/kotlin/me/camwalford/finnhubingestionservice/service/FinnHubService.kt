@@ -14,6 +14,7 @@ class FinnHubService(private val finnHubClient: FinnHubClient) {
     fun fetchCompanyNewsList(company: String, from: String, to: String): List<CompanyNews> {
         logger.info("Fetching market news from FinnHubClient for company: $company, from: $from, to: $to")
         val companyNewsList = finnHubClient.getCompanyNewsList(company, from, to)
+        logger.debug("Raw company news data: {}", ObjectMapper().writeValueAsString(companyNewsList))
         return companyNewsList
     }
 }
