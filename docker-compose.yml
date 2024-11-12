@@ -11,7 +11,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-admin}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Must set MYSQL_PASSWORD}
     ports:
-      - '3307:3307'
+      - '3307:3306'
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:  # Add healthcheck for dependent services
@@ -30,8 +30,7 @@ services:
       mysql:
         condition: service_healthy  # Wait for MySQL to be ready
     environment:
-      MYSQL_HOST: mysql  # Remove quotes, use direct service name
-      MYSQL_PORT: '3307'
+      MYSQL_HOST: mysql
       MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
       MYSQL_USER: ${MYSQL_USER:-admin}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -40,7 +39,7 @@ services:
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
     ports:
       - '8080:8080'
-    restart: unless-stopped
+#    restart: unless-stopped
 
   finnhub-ingestion-service:
     build:
@@ -52,7 +51,7 @@ services:
       FINNHUB_API_KEY: ${FINNHUB_API_KEY:?Must set FINNHUB_API_KEY}
     ports:
       - '8081:8081'
-    restart: unless-stopped
+#    restart: unless-stopped
 
   bert-sentiment-analysis-service:  # Changed to lowercase for consistency
     build:
@@ -60,7 +59,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8082:8082'
-    restart: unless-stopped
+#    restart: unless-stopped
 
   web-dashboard-service:
     build:
@@ -72,7 +71,7 @@ services:
       - '3000:80'
     depends_on:
       - backend-api-service
-    restart: unless-stopped
+#    restart: unless-stopped
 
 volumes:
   mysql-data:
