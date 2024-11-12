@@ -1,7 +1,6 @@
 package me.camwalford.backendapiservice.service
 
 import me.camwalford.backendapiservice.repository.UserRepository
-import org.apache.kafka.common.security.scram.internals.ScramFormatter.username
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.User
