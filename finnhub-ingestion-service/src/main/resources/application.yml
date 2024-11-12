@@ -1,24 +1,11 @@
 spring:
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        allow.auto.create.topics: true
-
+    application:
+        name: finnhub-ingestion-service
 
 finnhub:
   api:
-    apiKey: ${FINNHUB_API_KEY:cs1g4hhr01qsperu9s40cs1g4hhr01qsperu9s4g}  # Externalized, no default for security
+    apiKey: ${FINNHUB_API_KEY:cs1g4hhr01qsperu9s40cs1g4hhr01qsperu9s4g}  # Should be externalized, no default for security
 
-kafka:
-
-  topic:
-    company-news: company-news-topic
-    user-requests: user-requests-topic  # Added user-requests topic
-  key:
-    company-news: general
 
 logging:
   level:

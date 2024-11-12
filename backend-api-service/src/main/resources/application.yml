@@ -24,6 +24,10 @@ sentiment:
     service:
       url: ${SENTIMENT_ANALYSIS_SERVICE_URL:http://localhost:8082}
 
+cors:
+  allowed-origins:
+    - ${WEB_DASHBOARD_SERVICE_URL:http://localhost:3000}
+
 
 jwt:
   key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==} # Base64 encoded key, default is this random key for development
@@ -31,7 +35,7 @@ jwt:
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
 
 server:
-  port: ${PORT:8080}
+  port: ${BACKEND_API_SERVICE_PORT:8080}
 
 logging:
     level:

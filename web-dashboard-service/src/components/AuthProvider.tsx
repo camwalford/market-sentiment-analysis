@@ -1,9 +1,8 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {BrowserRouter as Router, useNavigate} from "react-router-dom";
+import API_URL from "../config/API";
 
 
-
-const API_URL = "http://localhost:8080/api";
 
 // Types
 interface UserData {

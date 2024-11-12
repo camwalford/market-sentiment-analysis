@@ -1,78 +1,83 @@
-version: '1.0'
+version: '3.8'  # Using latest stable version for better feature support
 
-
-# A Docker Compose file for running a full stack sentiment analysis application
 services:
-
-# MYSQL database for storing persistent data like user information
-# Only used by the backend-api-service
-# Requires a volume to persist data
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0  # Specify version for stability
     container_name: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:admin}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:sentiment}
-      MYSQL_USER: ${MYSQL_USER:admin}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:admin}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Must set MYSQL_ROOT_PASSWORD}  # Fail if not set
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
+      MYSQL_USER: ${MYSQL_USER:-admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Must set MYSQL_PASSWORD}
     ports:
-      - '3306:3306'
+      - '3307:3307'
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:  # Add healthcheck for dependent services
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# API Gateway service which routes requests to the appropriate backend service and handles authentication
   backend-api-service:
     build:
       context: backend-api-service
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
+      args:
+        JAVA_VERSION: ${JAVA_VERSION:-21}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy  # Wait for MySQL to be ready
     environment:
-      MYSQL_HOST: ${MYSQL_HOST:'mysql'}
-      MYSQL_PORT: '3306'
-      MYSQL_DATABASE: 'defaultdb'
-      MYSQL_USER: 'admin'
-      MYSQL_PASSWORD: 'admin'
-      JWT_KEY: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
-      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
-      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
-      JAVA_VERSION: ${JAVA_VERSION:21}
+      MYSQL_HOST: mysql  # Remove quotes, use direct service name
+      MYSQL_PORT: '3307'
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
+      MYSQL_USER: ${MYSQL_USER:-admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_KEY: ${JWT_KEY:?Must set JWT_KEY}
+      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
     ports:
       - '8080:8080'
+    restart: unless-stopped
 
-# Backend service for fetching company news articles
   finnhub-ingestion-service:
     build:
       context: finnhub-ingestion-service
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
       args:
-        JAVA_VERSION: ${JAVA_VERSION}
+        JAVA_VERSION: ${JAVA_VERSION:-21}
     environment:
-      FINNHUB_API_KEY: '${FINNHUB_API_KEY}'
-
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY:?Must set FINNHUB_API_KEY}
     ports:
       - '8081:8081'
+    restart: unless-stopped
 
-# Python service for sentiment analysis of news articles
-  BERT-sentiment-analysis-service:
+  bert-sentiment-analysis-service:  # Changed to lowercase for consistency
     build:
       context: BERT-sentiment-analysis-service
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     ports:
       - '8082:8082'
+    restart: unless-stopped
 
-# Frontend REACT application
   web-dashboard-service:
     build:
       context: web-dashboard-service
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
+    environment:
+        API_URL: http://backend-api-service:${BACKEND_API_SERVICE_PORT:-8080}/api
     ports:
       - '3000:80'
     depends_on:
-      - mysql
+      - backend-api-service
+    restart: unless-stopped
 
+volumes:
+  mysql-data:
+    name: mysql-data  # Explicitly name the volume
 
-
-
-
+networks:
+  default:
+    name: sentiment-analysis-network  # Explicitly name the network

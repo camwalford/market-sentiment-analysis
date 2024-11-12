@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config/API';
+
 import {
     ComposedChart,
     Bar,
@@ -64,7 +66,6 @@ const StockSentimentDashboard: React.FC = () => {
         ticker: string,
         days: number
     ): Promise<SentimentData[]> => {
-        const API_URL = 'http://localhost:8080/api';
         const toDate = new Date();
         const fromDate = new Date();
         fromDate.setDate(fromDate.getDate() - days + 1);
