@@ -22,16 +22,9 @@ class JwtAuthenticationFilter(
     private val logger = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
     override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain
+        request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
     ) {
         logger.info("Processing request to: ${request.requestURI}")
-        if (request.requestURI.startsWith("/api/auth/") || request.requestURI == "/error") {
-            logger.info("Skipping JWT authentication for auth endpoint: ${request.requestURI}")
-            filterChain.doFilter(request, response)
-            return
-        }
 
         val authHeader: String? = request.getHeader("Authorization")
         if (authHeader.doesNotContainBearerToken()) {
@@ -41,19 +34,9 @@ class JwtAuthenticationFilter(
         }
 
         val jwtToken = authHeader!!.extractTokenValue()
-        val email = tokenService.extractEmail(jwtToken)
         val username = tokenService.extractUsername(jwtToken)
 
-        if (username == null) {
-            logger.info("JWT does not contain a valid email.")
-        } else {
-            logger.info("Extracted email from JWT: $username")
-        }
-        if (SecurityContextHolder.getContext().authentication == null){
-            logger.info("Security context has no authentication.")
-        } else {
-            logger.info("Security context already contains authentication.")
-        }
+
         if (username != null && SecurityContextHolder.getContext().authentication == null) {
             logger.info("Security context has no authentication. Loading user details for: $username")
             val foundUser = userDetailsService.loadUserByUsername(username)
@@ -62,20 +45,17 @@ class JwtAuthenticationFilter(
                 logger.info("JWT token is valid for user: ${foundUser.username}. Updating security context.")
                 updateContext(foundUser, request)
             } else {
-                logger.warn("JWT token is invalid or expired for user: $email.")
+                logger.warn("JWT token is invalid or expired for user: $username.")
             }
-        } else if (SecurityContextHolder.getContext().authentication != null) {
-            logger.info("Security context already contains authentication. Skipping update.")
+            filterChain.doFilter(request, response)
         }
 
-        filterChain.doFilter(request, response)
+
     }
 
-    private fun String?.doesNotContainBearerToken() =
-        this == null || !this.startsWith("Bearer ")
+    private fun String?.doesNotContainBearerToken() = this == null || !this.startsWith("Bearer ")
 
-    private fun String.extractTokenValue() =
-        this.substringAfter("Bearer ")
+    private fun String.extractTokenValue() = this.substringAfter("Bearer ")
 
     private fun updateContext(foundUser: UserDetails, request: HttpServletRequest) {
         val authToken = UsernamePasswordAuthenticationToken(foundUser, null, foundUser.authorities)

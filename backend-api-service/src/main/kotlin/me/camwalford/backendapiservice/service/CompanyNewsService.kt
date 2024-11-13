@@ -1,6 +1,6 @@
 package me.camwalford.backendapiservice.service
 
-import me.camwalford.backendapiservice.dto.CompanyNews
+import me.camwalford.backendapiservice.controller.sentiment.CompanyNews
 import me.camwalford.backendapiservice.controller.sentiment.SentimentRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

@@ -26,7 +26,7 @@ class CustomUserDetailsService(
                 throw UsernameNotFoundException("User not found")
             }
         logger.info(
-            "Loaded user details: username={}, password={}, authorities={}",
+            "Loaded user details: username={}, password={}, ={}",
             user.username,
             user.password,
             user.authorities
@@ -39,7 +39,7 @@ class CustomUserDetailsService(
         return User.builder()
             .username(this.username)
             .password(this.password)
-            .authorities(this.role.name)
+            .roles(this.role.name)
             .build()
     }
 }

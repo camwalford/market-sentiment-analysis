@@ -12,7 +12,7 @@ spring:
       ddl-auto: update # adjusts the database schema as changes are made to the JPA entities
   docker:
     compose:
-      enabled: true
+      enabled: false
 
 finnhub:
   ingestion:

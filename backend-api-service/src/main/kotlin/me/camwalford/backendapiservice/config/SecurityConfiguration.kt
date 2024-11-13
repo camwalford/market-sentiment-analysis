@@ -23,29 +23,28 @@ class SecurityConfiguration(
     fun securityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter
-    ): DefaultSecurityFilterChain {
+    ): DefaultSecurityFilterChain =
         http
             .csrf { it.disable() }
 //            .cors { it.disable() }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/auth/login", "/api/auth/refresh", "/error", "/api/auth/logout", "/api/auth/register")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/auth/register")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
+                    .anyRequest()
+                    .fullyAuthenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .build()
 
-        return http.build()
-    }
 //
 //    @Bean
 //    fun corsConfigurationSource(): CorsConfigurationSource {

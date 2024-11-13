@@ -1,4 +1,4 @@
-package me.camwalford.backendapiservice.dto
+package me.camwalford.backendapiservice.controller.sentiment
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
