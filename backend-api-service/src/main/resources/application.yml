@@ -12,7 +12,7 @@ spring:
       ddl-auto: update # adjusts the database schema as changes are made to the JPA entities
   docker:
     compose:
-      enabled: false # Set to true if you are using Docker Compose
+      enabled: true
 
 finnhub:
   ingestion:
@@ -31,8 +31,8 @@ cors:
 
 jwt:
   key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==} # Base64 encoded key, default is this random key for development
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
-  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000} #1 hour
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000} #24 hours
 
 server:
   port: ${BACKEND_API_SERVICE_PORT:8080}

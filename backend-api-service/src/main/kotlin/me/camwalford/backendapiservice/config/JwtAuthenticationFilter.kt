@@ -26,6 +26,13 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        logger.info("Processing request to: ${request.requestURI}")
+        if (request.requestURI.startsWith("/api/auth/") || request.requestURI == "/error") {
+            logger.info("Skipping JWT authentication for auth endpoint: ${request.requestURI}")
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val authHeader: String? = request.getHeader("Authorization")
         if (authHeader.doesNotContainBearerToken()) {
             logger.info("Authorization header missing or does not contain Bearer token.")

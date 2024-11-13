@@ -1,11 +1,9 @@
-package me.camwalford.backendapiservice.controller
+package me.camwalford.backendapiservice.controller.auth
 
-import me.camwalford.backendapiservice.dto.AuthenticationRequest
-import me.camwalford.backendapiservice.dto.AuthenticationResponse
 import me.camwalford.backendapiservice.dto.RefreshTokenRequest
 import me.camwalford.backendapiservice.dto.TokenResponse
-import me.camwalford.backendapiservice.dto.UserRequest
-import me.camwalford.backendapiservice.dto.UserResponse
+import me.camwalford.backendapiservice.controller.user.UserRequest
+import me.camwalford.backendapiservice.controller.user.UserResponse
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository
 import me.camwalford.backendapiservice.service.AuthenticationService
 import me.camwalford.backendapiservice.service.UserService

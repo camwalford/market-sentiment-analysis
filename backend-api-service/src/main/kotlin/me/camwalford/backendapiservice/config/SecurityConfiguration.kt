@@ -26,13 +26,11 @@ class SecurityConfiguration(
     ): DefaultSecurityFilterChain {
         http
             .csrf { it.disable() }
-            .cors { it.disable() }
+//            .cors { it.disable() }
             .authorizeHttpRequests {
                 it
-                    // Allow all OPTIONS requests for CORS preflight
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                    .requestMatchers("/api/auth/login", "/api/auth/refresh", "/error", "/api/auth/logout")
+                    .requestMatchers("/api/auth/login", "/api/auth/refresh", "/error", "/api/auth/logout", "/api/auth/register")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/register")
                     .permitAll()
@@ -40,28 +38,25 @@ class SecurityConfiguration(
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
-                    .anyRequest()
-                    .fullyAuthenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authenticationProvider(authenticationProvider)
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
-
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000")  // Allow your frontend origin
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
-        configuration.allowCredentials = true
-
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
-    }
+//
+//    @Bean
+//    fun corsConfigurationSource(): CorsConfigurationSource {
+//        val configuration = CorsConfiguration()
+//        configuration.allowedOrigins = listOf("http://localhost:3000")  // Allow your frontend origin
+//        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//        configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
+//        configuration.allowCredentials = true
+//
+//        val source = UrlBasedCorsConfigurationSource()
+//        source.registerCorsConfiguration("/**", configuration)
+//        return source
+//    }
 }

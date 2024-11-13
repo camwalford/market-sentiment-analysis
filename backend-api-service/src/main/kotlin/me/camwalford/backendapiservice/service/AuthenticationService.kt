@@ -1,9 +1,9 @@
 package me.camwalford.backendapiservice.service
 
 import me.camwalford.backendapiservice.config.JwtProperties
-import me.camwalford.backendapiservice.dto.AuthenticationRequest
-import me.camwalford.backendapiservice.dto.AuthenticationResponse
-import me.camwalford.backendapiservice.dto.UserResponse
+import me.camwalford.backendapiservice.controller.auth.AuthenticationRequest
+import me.camwalford.backendapiservice.controller.auth.AuthenticationResponse
+import me.camwalford.backendapiservice.controller.user.UserResponse
 import me.camwalford.backendapiservice.model.RefreshToken
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository
 import me.camwalford.backendapiservice.repository.UserRepository

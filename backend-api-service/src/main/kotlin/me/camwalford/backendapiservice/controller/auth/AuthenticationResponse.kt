@@ -1,4 +1,5 @@
-package me.camwalford.backendapiservice.dto
+package me.camwalford.backendapiservice.controller.auth
+import me.camwalford.backendapiservice.controller.user.UserResponse
 import java.io.Serializable
 
 data class AuthenticationResponse(

@@ -1,4 +1,4 @@
-package me.camwalford.backendapiservice.dto
+package me.camwalford.backendapiservice.controller.user
 
 import me.camwalford.backendapiservice.model.User
 

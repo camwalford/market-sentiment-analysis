@@ -23,12 +23,12 @@ data class User(
     val password: String = "", // Hashed with bcrypt
 
     @Column(nullable = false)
-    val role: Role = Role.ROLE_USER, // "admin" or "user"
+    val role: Role = Role.USER, // "admin" or "user"
 
     @Column(nullable = false)
     var credits: Int = 20 // Default to 20 credits
 )
 
 enum class Role {
-    ROLE_USER, ROLE_ADMIN, ROLE_BANNED
+    USER, ADMIN, BANNED
 }

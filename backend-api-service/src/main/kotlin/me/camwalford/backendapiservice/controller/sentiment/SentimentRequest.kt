@@ -1,4 +1,4 @@
-package me.camwalford.backendapiservice.dto
+package me.camwalford.backendapiservice.controller.sentiment
 
 data class SentimentRequest(
     val ticker: String,

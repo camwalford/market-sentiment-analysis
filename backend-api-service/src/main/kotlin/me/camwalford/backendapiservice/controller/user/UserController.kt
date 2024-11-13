@@ -1,7 +1,5 @@
-package me.camwalford.backendapiservice.controller
+package me.camwalford.backendapiservice.controller.user
 
-import me.camwalford.backendapiservice.dto.UserRequest
-import me.camwalford.backendapiservice.dto.UserResponse
 import me.camwalford.backendapiservice.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
