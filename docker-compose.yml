@@ -24,12 +24,14 @@ services:
     build:
       context: backend-api-service
       dockerfile: Dockerfile
-      args:
-        JAVA_VERSION: ${JAVA_VERSION:-21}
+#      args:
+#        JAVA_VERSION: ${JAVA_VERSION:-21}
     depends_on:
       mysql:
         condition: service_healthy  # Wait for MySQL to be ready
     environment:
+      PORT: ${BACKEND_API_SERVICE_PORT:-8080}
+      JAVA_VERSION: ${JAVA_VERSION:-21}
       MYSQL_HOST: mysql
       MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
       MYSQL_USER: ${MYSQL_USER:-admin}
@@ -40,7 +42,7 @@ services:
       FINNHUB_INGESTION_SERVICE_URL: http://finnhub-ingestion-service:${FINNHUB_INGESTION_SERVICE_PORT:-8081}
       SENTIMENT_ANALYSIS_SERVICE_URL: http://bert-sentiment-analysis-service:8082  # Added
     ports:
-      - '8080:8080'
+      - '8080:${BACKEND_API_SERVICE_PORT:-8080}'
   #  restart: unless-stopped
 
   #    restart: unless-stopped
@@ -49,9 +51,8 @@ services:
     build:
       context: finnhub-ingestion-service
       dockerfile: Dockerfile
-      args:
-        JAVA_VERSION: ${JAVA_VERSION:-21}
     environment:
+      JAVA_VERSION: ${JAVA_VERSION:-21}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY:?Must set FINNHUB_API_KEY}
     ports:
       - '8081:8081'
