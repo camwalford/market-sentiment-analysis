@@ -1,7 +1,5 @@
 package me.camwalford.backendapiservice.controller.auth
 
-import me.camwalford.backendapiservice.dto.RefreshTokenRequest
-import me.camwalford.backendapiservice.dto.TokenResponse
 import me.camwalford.backendapiservice.controller.user.UserRequest
 import me.camwalford.backendapiservice.controller.user.UserResponse
 import me.camwalford.backendapiservice.repository.RefreshTokenRepository

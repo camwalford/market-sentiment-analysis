@@ -22,35 +22,37 @@ class JwtAuthenticationFilter(
     private val logger = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
     override fun doFilterInternal(
-        request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
     ) {
-        logger.info("Processing request to: ${request.requestURI}")
+        try {
+            logger.info("Processing request to: ${request.requestURI}")
 
-        val authHeader: String? = request.getHeader("Authorization")
-        if (authHeader.doesNotContainBearerToken()) {
-            logger.info("Authorization header missing or does not contain Bearer token.")
-            filterChain.doFilter(request, response)
-            return
-        }
+            val authHeader: String? = request.getHeader("Authorization")
+            if (!authHeader.doesNotContainBearerToken()) {
+                val jwtToken = authHeader!!.extractTokenValue()
+                val username = tokenService.extractUsername(jwtToken)
 
-        val jwtToken = authHeader!!.extractTokenValue()
-        val username = tokenService.extractUsername(jwtToken)
+                if (username != null && SecurityContextHolder.getContext().authentication == null) {
+                    logger.info("Security context has no authentication. Loading user details for: $username")
+                    val foundUser = userDetailsService.loadUserByUsername(username)
 
-
-        if (username != null && SecurityContextHolder.getContext().authentication == null) {
-            logger.info("Security context has no authentication. Loading user details for: $username")
-            val foundUser = userDetailsService.loadUserByUsername(username)
-
-            if (tokenService.isValid(jwtToken, foundUser)) {
-                logger.info("JWT token is valid for user: ${foundUser.username}. Updating security context.")
-                updateContext(foundUser, request)
+                    if (tokenService.isValid(jwtToken, foundUser)) {
+                        logger.info("JWT token is valid for user: ${foundUser.username}. Updating security context.")
+                        updateContext(foundUser, request)
+                    } else {
+                        logger.warn("JWT token is invalid or expired for user: $username")
+                    }
+                }
             } else {
-                logger.warn("JWT token is invalid or expired for user: $username.")
+                logger.info("Authorization header missing or does not contain Bearer token")
             }
+        } catch (e: Exception) {
+            logger.error("Error processing JWT token", e)
+        } finally {
             filterChain.doFilter(request, response)
         }
-
-
     }
 
     private fun String?.doesNotContainBearerToken() = this == null || !this.startsWith("Bearer ")

@@ -12,7 +12,7 @@ class CompanyNewsService(
     private val webClient: WebClient,
     @Value("\${finnhub.ingestion.service.url}") private val companyNewsServiceUrl: String
 ) {
-    fun fetchCompanyNews(request: SentimentRequest): List<CompanyNews> {
+    suspend fun fetchCompanyNews(request: SentimentRequest): List<CompanyNews> {
         return webClient.post()
             .uri("$companyNewsServiceUrl/finnhub/company-news/list")
             .bodyValue(request)

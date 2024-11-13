@@ -38,9 +38,12 @@ services:
       JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
       FINNHUB_INGESTION_SERVICE_URL: http://finnhub-ingestion-service:${FINNHUB_INGESTION_SERVICE_PORT:-8081}
+      SENTIMENT_ANALYSIS_SERVICE_URL: http://bert-sentiment-analysis-service:8082  # Added
     ports:
       - '8080:8080'
-#    restart: unless-stopped
+  #  restart: unless-stopped
+
+  #    restart: unless-stopped
 
   finnhub-ingestion-service:
     build:
@@ -72,6 +75,8 @@ services:
       - '3000:80'
     depends_on:
       - backend-api-service
+
+
 #    restart: unless-stopped
 
 volumes:
