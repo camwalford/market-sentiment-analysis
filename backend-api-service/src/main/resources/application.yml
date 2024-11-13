@@ -35,7 +35,7 @@ jwt:
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000} #24 hours
 
 server:
-  port: ${BACKEND_API_SERVICE_PORT:8080}
+  port: ${BACKEND_API_SERVICE_PORT}
 
 logging:
     level:

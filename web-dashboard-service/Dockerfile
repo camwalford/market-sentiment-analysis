@@ -13,16 +13,17 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+ARG REACT_APP_API_URL
 # Build the application
-RUN npm run build
+RUN REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8080} npm run build
 
-# Stage 2: Serve the React application using Nginx
+
 FROM nginx:alpine
 
 # Copy the built React app from the build stage to Nginx's default HTML folder
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 80
+# Expose port 80, nginx's default port
 EXPOSE 80
 
 # Start Nginx

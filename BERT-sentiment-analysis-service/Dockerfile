@@ -1,3 +1,4 @@
+ARG PORT
 FROM python:3.11-slim
 
 # Set the working directory in the container
@@ -10,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port 8082 to the outside world
-EXPOSE 8082
+EXPOSE ${PORT}
 
 # Run app.py when the container launches
 CMD ["python", "app.py"]
