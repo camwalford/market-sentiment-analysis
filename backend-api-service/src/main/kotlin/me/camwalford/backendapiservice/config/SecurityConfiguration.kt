@@ -38,7 +38,7 @@ class SecurityConfiguration(
                     .requestMatchers(HttpMethod.OPTIONS, "/**")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
-                    .permitAll()
+                    .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
 

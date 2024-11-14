@@ -26,7 +26,10 @@ data class User(
     val role: Role = Role.USER, // "admin" or "user"
 
     @Column(nullable = false)
-    var credits: Int = 20 // Default to 20 credits
+    var credits: Int = 20, // Default to 20 credits
+
+    @Column(nullable = false)
+    var requests: Int = 0 // Default to 0 requests
 )
 
 enum class Role {

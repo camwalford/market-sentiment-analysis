@@ -22,12 +22,15 @@ class SentimentController(
     private val logger = LoggerFactory.getLogger(SentimentController::class.java)
 
     @PostMapping
-    suspend fun getSentiment(
-        @AuthenticationPrincipal userDetails: UserDetails?,
+    fun getSentiment(
+        @AuthenticationPrincipal userDetails: UserDetails,
         @RequestBody request: SentimentRequest
     ): ResponseEntity<SentimentResponse> {
-        logger.info("Received sentiment request for ticker: ${request.ticker} by user: ${userDetails?.username}")
-        return ResponseEntity.ok(sentimentService.getSentiment(userDetails, request))
+        logger.info("Received sentiment request for ticker: ${request.ticker} by user: ${userDetails.username}")
+        val response = sentimentService.getSentiment(userDetails, request)
+        val responseEntity = ResponseEntity.ok(response)
+        val context = userDetails.username
+        return responseEntity
     }
 }
 

@@ -12,7 +12,7 @@ class SentimentAnalysisService(
     private val webClient: WebClient,
     @Value("\${sentiment.analysis.service.url}") private val sentimentAnalysisServiceUrl: String
 ) {
-    suspend fun analyzeSentiment(newsArticles: List<CompanyNews>): List<SentimentResult> {
+    fun analyzeSentiment(newsArticles: List<CompanyNews>): List<SentimentResult> {
         return webClient.post()
             .uri("$sentimentAnalysisServiceUrl/analyze-list")
             .bodyValue(newsArticles)

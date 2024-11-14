@@ -21,7 +21,7 @@ class SentimentService(
 ) {
     private val logger = LoggerFactory.getLogger(SentimentService::class.java)
 
-    suspend fun getSentiment(userDetails: UserDetails?, request: SentimentRequest): SentimentResponse {
+    fun getSentiment(userDetails: UserDetails?, request: SentimentRequest): SentimentResponse {
 
         if (userDetails == null) {
             throw ResponseStatusException(
@@ -30,14 +30,14 @@ class SentimentService(
             )
         }
 
-        logger.info("Processing sentiment request for ticker: ${request.ticker} by user: ${userDetails.username}")
-
         // Validate user
         val user = userService.findByUsername(userDetails.username)
             ?: throw ResponseStatusException(
                 HttpStatus.UNAUTHORIZED,
                 "User not found"
             )
+
+        userService.incrementRequests(user)
 
         // Check credits
         if (user.credits <= 0) {
@@ -62,8 +62,9 @@ class SentimentService(
                 "Sentiment analysis failed: ${ex.message}"
             )
         }
-
-        return SentimentResponse(sentimentResults, user.credits - 1)
+        val sentimentResponse = SentimentResponse(sentimentResults, user.credits - 1)
+        return sentimentResponse
     }
+
 }
 

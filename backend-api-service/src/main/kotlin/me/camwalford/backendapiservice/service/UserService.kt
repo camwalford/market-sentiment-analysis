@@ -1,5 +1,6 @@
 package me.camwalford.backendapiservice.service
 
+import me.camwalford.backendapiservice.model.Role
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -64,6 +65,12 @@ class UserService(
         }
     }
 
+    fun banUser(user: User) {
+        logger.info("Banning user with id: ${user.id}")
+        user.copy(role = Role.BANNED)
+        userRepository.save(user)
+    }
+
     @Transactional
     fun deductCredits(user: User, amount: Int) {
         logger.info("Deducting $amount credits from user with id: ${user.id}")
@@ -71,6 +78,13 @@ class UserService(
             throw Exception("User does not have enough credits")
         }
         user.credits -= amount
+        userRepository.save(user)
+    }
+
+    @Transactional
+    fun incrementRequests(user: User) {
+        logger.info("Incrementing requests for user with id: ${user.id}")
+        user.requests += 1
         userRepository.save(user)
     }
 }

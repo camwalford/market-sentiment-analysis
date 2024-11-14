@@ -9,7 +9,8 @@ data class UserResponse(
     val username: String,
     val email: String,
     val role: Role,
-    val credits: Int
+    val credits: Int,
+    val requests: Int,
 ) : Serializable {
     companion object {
         fun toResponse(user: User): UserResponse = UserResponse(
@@ -17,7 +18,8 @@ data class UserResponse(
             username = user.username,
             email = user.email,
             role = user.role,
-            credits = user.credits
+            credits = user.credits,
+            requests = user.requests,
         )
     }
 }

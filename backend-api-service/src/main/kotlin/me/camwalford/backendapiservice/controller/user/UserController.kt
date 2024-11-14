@@ -16,7 +16,6 @@ class UserController(
     private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
 
-
     @GetMapping
     fun listAll(): List<UserResponse> {
         logger.info("Listing all users")
