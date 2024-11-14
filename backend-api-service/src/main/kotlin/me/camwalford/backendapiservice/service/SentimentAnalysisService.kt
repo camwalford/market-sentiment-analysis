@@ -2,6 +2,7 @@ package me.camwalford.backendapiservice.service
 
 import me.camwalford.backendapiservice.controller.sentiment.CompanyNews
 import me.camwalford.backendapiservice.controller.sentiment.SentimentResult
+import me.camwalford.backendapiservice.exception.SentimentAnalysisException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -18,6 +19,6 @@ class SentimentAnalysisService(
             .bodyValue(newsArticles)
             .retrieve()
             .bodyToMono<List<SentimentResult>>()
-            .block() ?: throw RuntimeException("Error in Sentiment Analysis Service")
+            .block() ?: throw SentimentAnalysisException("Error in Sentiment Analysis Service")
     }
 }

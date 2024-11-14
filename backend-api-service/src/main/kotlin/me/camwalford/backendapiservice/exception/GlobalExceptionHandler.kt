@@ -51,3 +51,6 @@ class InsufficientCreditsException(message: String) :
 
 class NewsApiException(message: String) :
     ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, message)
+
+class SentimentAnalysisException(message: String) :
+    ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, message)
