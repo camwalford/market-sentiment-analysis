@@ -1,5 +1,5 @@
 // useAuthFetch.ts
-import { useAuth } from './AuthProvider';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useAuthFetch = () => {
     const { auth, refreshAccessToken } = useAuth();

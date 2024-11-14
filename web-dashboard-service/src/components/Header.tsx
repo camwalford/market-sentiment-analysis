@@ -1,4 +1,4 @@
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 import React from "react";
 import { FaUserCircle } from "react-icons/fa"; // Font Awesome for the user icon
 

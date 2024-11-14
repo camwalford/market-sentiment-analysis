@@ -12,7 +12,7 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import { Search, Calendar } from 'lucide-react';
-import { useAuth } from './AuthProvider';
+import { useAuth } from '../contexts/AuthContext';
 import { useAuthFetch } from './useAuthFetch';
 
 interface SentimentData {

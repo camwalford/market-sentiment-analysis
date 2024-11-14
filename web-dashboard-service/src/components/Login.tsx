@@ -1,7 +1,7 @@
 // Login Component
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
-import {useAuth} from "./AuthProvider";
+import {useAuth} from "../contexts/AuthContext";
 
 const Login: React.FC = () => {
     const { handleLogin, handleForgotPassword, auth } = useAuth();
