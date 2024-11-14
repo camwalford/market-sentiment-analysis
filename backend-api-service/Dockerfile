@@ -4,11 +4,11 @@ FROM eclipse-temurin:${JAVA_VERSION:-21}-jdk-alpine AS build
 WORKDIR /app
 COPY . .
 
-# Change the line endings to Unix-style and ensure the gradlew script is executable
-RUN sed -i 's/\r$//' gradlew
-RUN chmod +x gradlew
-RUN ls -la
-RUN ./gradlew clean build --no-daemon
+## Change the line endings to Unix-style and ensure the gradlew script is executable
+#RUN sed -i 's/\r$//' gradlew
+#RUN chmod +x gradlew
+#RUN ls -la
+#RUN ./gradlew clean build --no-daemon
 
 # Stage 2: Run the application
 ARG JAVA_VERSION

@@ -40,11 +40,11 @@ services:
       JWT_KEY: ${JWT_KEY:?Must set JWT_KEY}
       JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
-      FINNHUB_INGESTION_SERVICE_URL: http://finnhub-ingestion-service:${FINNHUB_INGESTION_SERVICE_PORT}
-      SENTIMENT_ANALYSIS_SERVICE_URL: http://bert-sentiment-analysis-service:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT}
-      WEB_DASHBOARD_SERVICE_URL: http://web-dashboard-service:${WEB_DASHBOARD_SERVICE_PORT}
+      FINNHUB_INGESTION_SERVICE_URL: ${FINNHUB_INGESTION_SERVICE_URL}:${FINNHUB_INGESTION_SERVICE_PORT}
+      BERT_SENTIMENT_ANALYSIS_SERVICE_URL: ${BERT_SENTIMENT_ANALYSIS_SERVICE_URL}:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT}
+      WEB_DASHBOARD_SERVICE_URL: ${WEB_DASHBOARD_SERVICE_URL}:${WEB_DASHBOARD_SERVICE_PORT}
     ports:
-      - '${BACKEND_API_SERVICE_PORT:-8080}'
+      - '${BACKEND_API_SERVICE_PORT:-8080}:${BACKEND_API_SERVICE_PORT:-8080}'
 
   finnhub-ingestion-service:
     build:
@@ -58,7 +58,7 @@ services:
       JAVA_VERSION: ${JAVA_VERSION:-21}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY:?Must set FINNHUB_API_KEY}
     ports:
-      - '${FINNHUB_INGESTION_SERVICE_PORT:-8081}'
+      - '${FINNHUB_INGESTION_SERVICE_PORT:-8081}:${FINNHUB_INGESTION_SERVICE_PORT:-8081}'
 
   bert-sentiment-analysis-service:
     build:
@@ -69,14 +69,14 @@ services:
     environment:
       PORT: ${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}
     ports:
-      - '${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}'
+      - '${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}'
 
   web-dashboard-service:
     build:
       context: web-dashboard-service
       dockerfile: Dockerfile
       args: # Pass the api url as a build argument because node.js can't access container environment variables it seems
-        REACT_APP_API_URL: 'http://backend-api-service:${BACKEND_API_SERVICE_PORT}/api'
+        REACT_APP_API_URL: '${BACKEND_API_SERVICE_URL}:${BACKEND_API_SERVICE_PORT}/api'
     environment:
       PORT: ${WEB_DASHBOARD_SERVICE_PORT:-3000}
     ports:
