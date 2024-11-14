@@ -22,7 +22,7 @@ finnhub:
 sentiment:
   analysis:
     service:
-      url: ${SENTIMENT_ANALYSIS_SERVICE_URL:http://localhost:8082}
+      url: ${BERT_SENTIMENT_ANALYSIS_SERVICE_URL:http://localhost:8082}
 
 cors:
   allowed-origins:
@@ -35,7 +35,7 @@ jwt:
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000} #24 hours
 
 server:
-  port: ${PORT:-8080}
+  port: ${PORT:8080}
 
 logging:
     level:

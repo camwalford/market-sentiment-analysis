@@ -16,7 +16,7 @@ ARG PORT
 FROM eclipse-temurin:${JAVA_VERSION:-21}-jdk-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE ${PORT}
+EXPOSE ${PORT:-8081}
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
