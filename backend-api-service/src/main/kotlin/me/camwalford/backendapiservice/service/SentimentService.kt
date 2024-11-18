@@ -71,7 +71,7 @@ class SentimentService(
                 "Failed to decrement credits: ${ex.message}"
             )
         }
-        val sentimentResponse = SentimentResponse(sentimentResults, user.credits - 1)
+        val sentimentResponse = SentimentResponse(sentimentResults, user.credits)
         return sentimentResponse
     }
 

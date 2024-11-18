@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -18,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 class SecurityConfiguration(
     private val authenticationProvider: AuthenticationProvider
 ) {
@@ -49,10 +51,13 @@ class SecurityConfiguration(
                         "/api/auth/validate",
                         "/api/auth/check-username/**",
                         "/api/auth/check-email/**"
+
                     ).permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     // Protected endpoints
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
+                    .hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/user/me")
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")

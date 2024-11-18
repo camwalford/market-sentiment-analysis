@@ -24,7 +24,7 @@ class SentimentController(
     @PostMapping("/analyze")
     @Operation(
         summary = "Detailed sentiment analysis",
-        description = "Performs detailed sentiment analysis with customizable parameters. Costs 3 credits."
+        description = "Performs detailed sentiment analysis with customizable parameters. Costs 1 credits."
     )
     fun analyzeSentiment(
         @AuthenticationPrincipal userDetails: UserDetails,

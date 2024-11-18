@@ -23,6 +23,7 @@ class UserController(
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(
         summary = "Get current user",
         description = "Returns the profile of the currently authenticated user",
