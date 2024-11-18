@@ -65,7 +65,7 @@ spring:
   app:
     cookie:
       domain: ${COOKIE_DOMAIN_DEV:localhost}
-      secure: ${COOKIE_SECURE_DEV:false}
+      secure: ${COOKIE_SECURE_DEV:true}
       same-site: ${COOKIE_SAME_SITE_DEV:Lax}
 
 ---

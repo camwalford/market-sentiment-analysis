@@ -39,7 +39,8 @@ class SecurityConfiguration(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html/*",
-                        "/webjars/**"
+                        "/webjars/**",
+                        "/error"
                     ).permitAll()
                     // Auth endpoints
                     .requestMatchers(
@@ -74,7 +75,7 @@ class SecurityConfiguration(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000", "http://web-dashboard-service:3000")
+        configuration.allowedOrigins = listOf("http://localhost:3000", "http://web-dashboard-service:3000, https://stocks.camwalford.me")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         // Update allowed headers to include Authorization for Swagger
         configuration.allowedHeaders = listOf(
