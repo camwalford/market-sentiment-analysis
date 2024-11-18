@@ -11,6 +11,7 @@ interface User {
     email: string;
     role: string;
     credits: number;
+    requests: number;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -67,6 +68,7 @@ const AdminDashboard: React.FC = () => {
                         <th className="py-2 px-4 border-b">Email</th>
                         <th className="py-2 px-4 border-b">Role</th>
                         <th className="py-2 px-4 border-b">Credits</th>
+                        <th className="py-2 px-4 border-b">Requests</th>
                         <th className="py-2 px-4 border-b">Actions</th>
                     </tr>
                     </thead>
@@ -78,6 +80,7 @@ const AdminDashboard: React.FC = () => {
                             <td className="py-2 px-4 border-b">{user.email}</td>
                             <td className="py-2 px-4 border-b">{user.role}</td>
                             <td className="py-2 px-4 border-b">{user.credits}</td>
+                            <td className="py-2 px-4 border-b">{user.requests}</td>
                             <td className="py-2 px-4 border-b">
                                 <button
                                     onClick={() => deleteUser(user.id)}
