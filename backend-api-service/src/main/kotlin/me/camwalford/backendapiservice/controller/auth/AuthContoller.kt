@@ -18,6 +18,8 @@ import me.camwalford.backendapiservice.controller.user.UserResponse
 import me.camwalford.backendapiservice.service.AuthenticationService
 import me.camwalford.backendapiservice.service.UserService
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 
 
 @RestController
@@ -116,12 +118,14 @@ class AuthController(
     }
 
     @PostMapping("/validate")
-    @Operation(
-        summary = "Validate token",
-        description = "Validates the current access token. Requires authentication."
-    )
-    fun validateToken(): ResponseEntity<Void> {
-        // If the request reaches here, the token is valid (due to JWT filter)
-        return ResponseEntity.ok().build()
+    @Operation(summary = "Validate session", description = "Validates the current session and returns user data")
+    fun validateSession(@AuthenticationPrincipal userDetails: UserDetails): ResponseEntity<UserResponse> {
+        val user = userService.findByUsername(userDetails.username)
+        if (user == null) {
+            logger.warn("User not found for username: ${userDetails.username}")
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        }
+        logger.info("Session validated for user: ${user.username}")
+        return ResponseEntity.ok(UserResponse.toResponse(user))
     }
 }

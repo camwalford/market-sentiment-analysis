@@ -1,33 +1,35 @@
 // types/auth.ts
-export type UserRole = 'user' | 'admin'; // Define possible roles
+export type UserRole = 'USER' | 'ADMIN' | 'PREMIUM_USER';
 
-export interface UserData {
+export interface User {
+    id: number;
+    username: string;
     email: string;
+    role: UserRole;
     credits: number;
-    role: UserRole;  // Update to use specific role type
-}
-
-
-export interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-    user: UserData;
 }
 
 export interface AuthState {
-    accessToken: string | null;
-    refreshToken: string | null;
-    user: UserData | null;
+    user: User | null;
     loading: boolean;
+    error: string | null;
 }
 
 export interface AuthContextType {
     auth: AuthState;
-    handleLogin: (email: string, password: string) => Promise<void>;
+    handleLogin: (username: string, password: string) => Promise<void>;
     handleLogout: () => Promise<void>;
-    handleForgotPassword: (email: string) => Promise<void>;
     handleRegister: (username: string, email: string, password: string) => Promise<void>;
-    deductCredits: (amount: number) => void;
-    refreshAccessToken: () => Promise<string>;
-    setCredits: (newCredits: number) => void;
+    updateUserData: (userData: Partial<User>) => void;
+    validateSession: () => Promise<boolean>;
+    clearError: () => void;
+}
+
+export interface LoginResponse {
+    user: User;
+}
+
+export interface ApiError {
+    message: string;
+    status: number;
 }

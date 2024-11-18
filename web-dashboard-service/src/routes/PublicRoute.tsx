@@ -1,4 +1,3 @@
-// routes/PublicRoute.tsx
 import React, { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -11,13 +10,18 @@ interface PublicRouteProps {
 const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
     const { auth } = useAuth();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || "/dashboard";
 
-    if (auth.accessToken) {
+    // Redirect authenticated users
+    if (auth.user) {
         return <Navigate to={from} replace />;
     }
 
-    return <MainLayout>{children}</MainLayout>;
+    return (
+        <MainLayout>
+            {children}
+        </MainLayout>
+    );
 };
 
 export default PublicRoute;

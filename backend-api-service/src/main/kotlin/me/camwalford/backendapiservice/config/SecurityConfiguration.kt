@@ -45,7 +45,10 @@ class SecurityConfiguration(
                         "/api/auth/refresh",
                         "/error",
                         "/api/auth/logout",
-                        "/api/auth/register"
+                        "/api/auth/register",
+                        "/api/auth/validate",
+                        "/api/auth/check-username/**",
+                        "/api/auth/check-email/**"
                     ).permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     // Protected endpoints

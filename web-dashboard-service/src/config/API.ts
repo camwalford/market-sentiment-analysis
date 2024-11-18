@@ -1,6 +1,14 @@
-
-console.log("API URL:", process.env.REACT_APP_API_URL); // Should output the API URL or "undefined" if not set
-
+// config/API.ts
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
+
+export const API_CONFIG = {
+    baseURL: API_URL,
+    defaultOptions: {
+        credentials: 'include' as RequestCredentials,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    },
+};
 
 export default API_URL;

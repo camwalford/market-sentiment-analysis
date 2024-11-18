@@ -1,12 +1,12 @@
 // utils/storage.ts
-import {UserData} from "../types/auth";
+import {User} from "../types/auth";
 
 export class AuthStorage {
     private static readonly ACCESS_TOKEN_KEY = 'accessToken';
     private static readonly REFRESH_TOKEN_KEY = 'refreshToken';
     private static readonly USER_KEY = 'user';
 
-    static saveTokens(accessToken: string, refreshToken: string, user: UserData): void {
+    static saveTokens(accessToken: string, refreshToken: string, user: User): void {
         localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
         localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
@@ -18,7 +18,7 @@ export class AuthStorage {
         localStorage.removeItem(this.USER_KEY);
     }
 
-    static getStoredAuth(): { accessToken: string; refreshToken: string; user: UserData } | null {
+    static getStoredAuth(): { accessToken: string; refreshToken: string; user: User } | null {
         const accessToken = localStorage.getItem(this.ACCESS_TOKEN_KEY);
         const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
         const userStr = localStorage.getItem(this.USER_KEY);
@@ -33,7 +33,7 @@ export class AuthStorage {
         return null;
     }
 
-    static updateUser(user: UserData): void {
+    static updateUser(user: User): void {
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     }
 

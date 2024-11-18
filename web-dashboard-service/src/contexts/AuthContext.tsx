@@ -1,7 +1,7 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
+// contexts/AuthContext.tsx
+import React, { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthState, AuthContextType } from "../types/auth";
-import { AuthStorage } from "../utils/storage";
+import { AuthState, AuthContextType, User } from "../types/auth";
 import AuthAPI from "../services/authAPI";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,151 +14,112 @@ export const useAuth = () => {
 
 const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [auth, setAuth] = useState<AuthState>({
-        accessToken: null,
-        refreshToken: null,
         user: null,
-        loading: false,
+        loading: true,
+        error: null,
     });
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const storedAuth = AuthStorage.getStoredAuth();
-        if (storedAuth) {
+    const validateSession = useCallback(async () => {
+        try {
+            setAuth(prev => ({ ...prev, loading: true }));
+            const userData = await AuthAPI.validateSession();
             setAuth({
-                ...storedAuth,
+                user: userData,
                 loading: false,
+                error: null,
             });
+            return true;
+        } catch (error) {
+            setAuth({
+                user: null,
+                loading: false,
+                error: error instanceof Error ? error.message : "Session validation failed",
+            });
+            return false;
         }
     }, []);
 
-    const setLoading = (loading: boolean) => {
-        setAuth(prev => ({ ...prev, loading }));
-    };
-
-    const deductCredits = (amount: number) => {
-        setAuth(prevAuth => {
-            if (!prevAuth.user) return prevAuth;
-
-            const updatedUser = {
-                ...prevAuth.user,
-                credits: prevAuth.user.credits - amount
-            };
-            AuthStorage.updateUser(updatedUser);
-
-            return {
-                ...prevAuth,
-                user: updatedUser,
-            };
-        });
-    };
 
     const handleLogin = async (username: string, password: string) => {
-        setLoading(true);
+        setAuth(prev => ({ ...prev, loading: true, error: null }));
         try {
             const response = await AuthAPI.login(username, password);
-            AuthStorage.saveTokens(response.accessToken, response.refreshToken, response.user);
             setAuth({
-                accessToken: response.accessToken,
-                refreshToken: response.refreshToken,
                 user: response.user,
                 loading: false,
+                error: null,
             });
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
-            setLoading(false);
+            setAuth(prev => ({
+                ...prev,
+                loading: false,
+                error: error instanceof Error ? error.message : "Login failed",
+            }));
             throw error;
         }
     };
 
     const handleLogout = async () => {
-        setLoading(true);
+        setAuth(prev => ({ ...prev, loading: true }));
         try {
-            if (auth.refreshToken) {
-                await AuthAPI.logout(auth.refreshToken);
-            }
-            // Clear local storage and state even if the API call fails
-            AuthStorage.clearTokens();
-            setAuth({
-                accessToken: null,
-                refreshToken: null,
-                user: null,
-                loading: false,
-            });
-            navigate('/login');
-        } catch (error) {
-            console.error('Logout error:', error);
-            // Still clear everything locally even if the API call fails
-            AuthStorage.clearTokens();
-            setAuth({
-                accessToken: null,
-                refreshToken: null,
-                user: null,
-                loading: false,
-            });
-            navigate('/login');
-        }
-    };
-
-    const handleForgotPassword = async (email: string) => {
-        setLoading(true);
-        try {
-            await AuthAPI.forgotPassword(email);
+            await AuthAPI.logout();
         } finally {
-            setLoading(false);
+            setAuth({
+                user: null,
+                loading: false,
+                error: null,
+            });
+            navigate('/login');
         }
     };
 
     const handleRegister = async (username: string, email: string, password: string) => {
-        setLoading(true);
+        setAuth(prev => ({ ...prev, loading: true, error: null }));
         try {
-            await AuthAPI.register(username, email, password);
-            const response = await AuthAPI.login(email, password);
-            AuthStorage.saveTokens(response.accessToken, response.refreshToken, response.user);
+            const userData = await AuthAPI.register(username, email, password);
+            const isSessionValid = await validateSession();
+
+            if (!isSessionValid) {
+                throw new Error("Registration successful but session validation failed");
+            }
+
             setAuth({
-                accessToken: response.accessToken,
-                refreshToken: response.refreshToken,
-                user: response.user,
+                user: userData,
                 loading: false,
+                error: null,
             });
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
-            setLoading(false);
+            setAuth(prev => ({
+                ...prev,
+                loading: false,
+                error: error instanceof Error ? error.message : "Registration failed",
+            }));
             throw error;
         }
     };
 
-    const refreshAccessToken = async () => {
-        try {
-            if (!auth.refreshToken) throw new Error("No refresh token available");
-            const newAccessToken = await AuthAPI.refreshToken(auth.refreshToken);
-            AuthStorage.updateAccessToken(newAccessToken);
-            setAuth(prev => ({ ...prev, accessToken: newAccessToken }));
-            return newAccessToken;
-        } catch (error) {
-            await handleLogout();
-            throw error;
-        }
-    };
+    const updateUserData = useCallback((userData: Partial<User>) => {
+        setAuth(prev => ({
+            ...prev,
+            user: prev.user ? { ...prev.user, ...userData } : null,
+        }));
+    }, []);
 
-    const setCredits = (newCredits: number) => {
-        setAuth(prevAuth => {
-            if (!prevAuth.user) return prevAuth;
-
-            const updatedUser = { ...prevAuth.user, credits: newCredits };
-            AuthStorage.updateUser(updatedUser);
-            return { ...prevAuth, user: updatedUser };
-        });
-    };
+    const clearError = useCallback(() => {
+        setAuth(prev => ({ ...prev, error: null }));
+    }, []);
 
     const contextValue: AuthContextType = {
         auth,
         handleLogin,
         handleLogout,
-        handleForgotPassword,
         handleRegister,
-        deductCredits,
-        refreshAccessToken,
-        setCredits
+        updateUserData,
+        validateSession,
+        clearError,
     };
 
     return (

@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { Search, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useAuthFetch } from './useAuthFetch';
+import { useAuthFetch } from '../hooks/useAuthFetch';
 
 interface SentimentData {
     date: number;
@@ -55,61 +55,42 @@ const StockSentimentDashboard: React.FC = () => {
     const [data, setData] = useState<SentimentData[]>([]);
     const [chartData, setChartData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { auth, deductCredits, setCredits } = useAuth();
-    const fetchWithAuth = useAuthFetch();
+    const { auth, updateUserData } = useAuth();
+    const { fetchWithAuth } = useAuthFetch();
 
     useEffect(() => {
         transformDataForChart();
     }, [data, grouping]);
 
-    const fetchSentiment = async (
-        ticker: string,
-        days: number
-    ): Promise<SentimentData[]> => {
+    const fetchSentiment = async (ticker: string, days: number): Promise<SentimentData[]> => {
         const toDate = new Date();
         const fromDate = new Date();
         fromDate.setDate(fromDate.getDate() - days + 1);
 
-        const fromDateUTC = fromDate.toISOString();
-        const toDateUTC = toDate.toISOString();
-
         try {
-            const response = await fetchWithAuth(`${API_URL}/sentiment`, {
+            const response = await fetchWithAuth(`${API_URL}/sentiment/analyze`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     ticker,
-                    fromDate: fromDateUTC,
-                    toDate: toDateUTC,
+                    fromDate: fromDate.toISOString(),
+                    toDate: toDate.toISOString(),
                 }),
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to fetch sentiment data');
-            }
-
             const responseData: SentimentResponse = await response.json();
 
-            // Update credits in AuthContext
-            setCredits(responseData.creditsRemaining);
+            // Update user data in context
+            if (auth.user && responseData.creditsRemaining !== auth.user.credits) {
+                updateUserData({ credits: responseData.creditsRemaining });
+            }
 
-            const sentimentData: SentimentData[] = responseData.results.map((item) => ({
-                date: item.date,
-                sentiment: item.sentiment,
-                confidence: item.confidence,
-                ticker: item.ticker,
-                id: item.id,
-            }));
-
-            return sentimentData;
+            return responseData.results;
         } catch (error) {
             console.error('Error fetching sentiment data:', error);
             throw error;
         }
     };
+
 
     const updateData = async () => {
         setIsLoading(true);
@@ -157,6 +138,8 @@ const StockSentimentDashboard: React.FC = () => {
 
         setChartData(completeChartData);
     };
+
+
 
 // Helper function to parse the grouping interval
     const parseGroupingInterval = (grouping: string): number => {
