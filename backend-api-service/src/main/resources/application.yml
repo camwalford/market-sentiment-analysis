@@ -41,7 +41,7 @@ app:
   cookie:
     domain: ${COOKIE_DOMAIN:stocks.camwalford.me}
     secure: ${COOKIE_SECURE:true}
-    same-site: ${COOKIE_SAME_SITE:Lax}
+    same-site: ${COOKIE_SAME_SITE:None}
 
 server:
   port: ${PORT:8080}
@@ -84,7 +84,7 @@ spring:
     cookie:
       domain: ${COOKIE_DOMAIN_PROD:stocks.camwalford.me}
       secure: ${COOKIE_SECURE_PROD:true}
-      same-site: ${COOKIE_SAME_SITE_PROD:Lax}
+      same-site: ${COOKIE_SAME_SITE_PROD:None}
 
 server:
   port: ${PORT:80}
