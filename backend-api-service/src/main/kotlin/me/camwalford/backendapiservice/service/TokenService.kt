@@ -16,12 +16,11 @@ class TokenService(
     private val secretKey = Keys.hmacShaKeyFor(
         jwtProperties.key.toByteArray()
     )
-    fun generate(
-        userDetails: UserDetails,
-        expirationDate: Date,
-        additionalClaims: Map<String, Any> = emptyMap()
-    ): String =
-        Jwts.builder()
+    fun generate(userDetails: UserDetails, expirationDate: Date, additionalClaims: Map<String, Any> = emptyMap()
+    ): String
+    {
+
+        return Jwts.builder()
             .claims()
             .subject(userDetails.username)
             .issuedAt(Date(System.currentTimeMillis()))
@@ -30,13 +29,14 @@ class TokenService(
             .and()
             .signWith(secretKey)
             .compact()
-
-    fun isValid(token: String, userDetails: UserDetails): Boolean {
-        val email = extractEmail(token)
-        return userDetails.username == email && !isExpired(token)
     }
 
-    fun extractEmail(token: String): String? =
+    fun isValid(token: String, userDetails: UserDetails): Boolean {
+        val username = extractUsername(token)
+        return userDetails.username == username && !isExpired(token)
+    }
+
+    fun extractUsername(token: String): String? =
         getAllClaims(token)
             .subject
 

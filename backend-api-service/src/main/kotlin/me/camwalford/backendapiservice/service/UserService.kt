@@ -1,11 +1,13 @@
 package me.camwalford.backendapiservice.service
 
+import me.camwalford.backendapiservice.model.Role
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import me.camwalford.backendapiservice.model.User
 import me.camwalford.backendapiservice.repository.UserRepository
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -20,6 +22,10 @@ class UserService(
             logger.warn("User with email ${user.email} already exists")
             return null
         }
+        if (userRepository.findUserByUsername(user.username) != null) {
+            logger.warn("User with username ${user.username} already exists")
+            return null
+        }
         val hashedPassword = passwordEncoder.encode(user.password)
         val userWithHashedPassword = user.copy(password = hashedPassword)
         val savedUser = userRepository.save(userWithHashedPassword)
@@ -27,9 +33,24 @@ class UserService(
         return savedUser
     }
 
+    fun isUsernameAvailable(username: String): Boolean {
+        logger.info("Checking if username is available: $username")
+        return userRepository.findUserByUsername(username) == null
+    }
+
+    fun isEmailAvailable(email: String): Boolean {
+        logger.info("Checking if email is available: $email")
+        return userRepository.findByEmail(email) == null
+    }
+
     fun findByEmail(email: String): User? {
         logger.info("Finding user with email: $email")
         return userRepository.findByEmail(email)
+    }
+
+    fun findByUsername(username: String): User? {
+        logger.info("Finding user with username: $username")
+        return userRepository.findUserByUsername(username)
     }
 
     fun findById(id: Long): User? {
@@ -52,5 +73,28 @@ class UserService(
             logger.warn("User with id $id does not exist")
             false
         }
+    }
+
+    fun banUser(user: User) {
+        logger.info("Banning user with id: ${user.id}")
+        user.copy(role = Role.BANNED)
+        userRepository.save(user)
+    }
+
+    @Transactional
+    fun deductCredits(user: User, amount: Int) {
+        logger.info("Deducting $amount credits from user with id: ${user.id}")
+        if (user.credits < amount) {
+            throw Exception("User does not have enough credits")
+        }
+        user.credits -= amount
+        userRepository.save(user)
+    }
+
+    @Transactional
+    fun incrementRequests(user: User) {
+        logger.info("Incrementing requests for user with id: ${user.id}")
+        user.requests += 1
+        userRepository.save(user)
     }
 }

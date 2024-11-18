@@ -12,11 +12,13 @@ class FinnHubClient(private val apiClient: DefaultApi) {
 
     fun getCompanyNewsList(company: String, from: String, to: String): List<CompanyNews> {
         logger.info("Fetching news for company: $company with from: $from  to: $to")
-
-        val companyNewsData = apiClient.companyNews(company, from, to)
-        logger.debug("Raw company news data: {}", companyNewsData)
-
-        return companyNewsData
+        try{
+            val companyNewsList = apiClient.companyNews(company, from, to)
+            return companyNewsList
+        } catch (e: Exception) {
+            logger.error("Error occurred during fetchCompanyNewsList", e)
+            throw e
+        }
     }
 }
 

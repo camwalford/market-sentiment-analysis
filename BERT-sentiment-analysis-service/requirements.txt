@@ -1,4 +1,10 @@
-confluent-kafka
+fastapi
+uvicorn
+pydantic
+pydantic-settings
 transformers
 torch
 PyYAML
+pytest
+httpx
+typing

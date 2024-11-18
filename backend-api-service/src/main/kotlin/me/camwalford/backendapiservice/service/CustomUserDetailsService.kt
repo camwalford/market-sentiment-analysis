@@ -19,14 +19,14 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(username: String): UserDetails {
         logger.info("Loading user by username: $username")
-        val user = userRepository.findByEmail(username)
+        val user = userRepository.findUserByUsername(username)
             ?.mapToUserDetails()
             ?: run {
                 logger.warn("User not found with username: $username")
                 throw UsernameNotFoundException("User not found")
             }
-        logger.debug(
-            "Loaded user details: username={}, password={}, authorities={}",
+        logger.info(
+            "Loaded user details: username={}, password={}, ={}",
             user.username,
             user.password,
             user.authorities
@@ -35,11 +35,11 @@ class CustomUserDetailsService(
     }
 
     private fun ApplicationUser.mapToUserDetails(): UserDetails {
-        logger.debug("Mapping ApplicationUser to UserDetails for user: ${this.email}")
+        logger.debug("Mapping ApplicationUser to UserDetails for user: ${this.username}")
         return User.builder()
-            .username(this.email)
+            .username(this.username)
             .password(this.password)
-            .authorities(this.role.name)
+            .roles(this.role.name)
             .build()
     }
 }
