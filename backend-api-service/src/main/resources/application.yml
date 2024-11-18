@@ -38,7 +38,7 @@ jwt:
 
 app:
   cookie:
-    domain: ${COOKIE_DOMAIN:localhost}
+    domain: ${COOKIE_DOMAIN:stocks.camwalford.me}
     secure: ${COOKIE_SECURE:true}
     same-site: ${COOKIE_SAME_SITE:Lax}
 
