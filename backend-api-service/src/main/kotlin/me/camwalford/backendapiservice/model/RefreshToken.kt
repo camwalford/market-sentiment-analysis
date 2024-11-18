@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
+
 @Entity
 @Table(name = "refresh_tokens")
 data class RefreshToken(
@@ -23,4 +24,3 @@ data class RefreshToken(
     @JoinColumn(name = "user_id", nullable = false)
     val user: User = User()
 )
-

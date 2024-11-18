@@ -1,16 +1,10 @@
 package me.camwalford.backendapiservice.controller.user
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
+
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import me.camwalford.backendapiservice.service.UserService
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -41,47 +35,6 @@ class UserController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
     }
 
-//    @PutMapping("/me")
-//    @Operation(
-//        summary = "Update current user",
-//        description = "Updates the profile of the currently authenticated user",
-//        security = [SecurityRequirement(name = "bearer-auth")]
-//    )
-//    fun updateCurrentUser(
-//        @AuthenticationPrincipal userDetails: UserDetails,
-//        @RequestBody request: UserUpdateRequest
-//    ): UserResponse {
-//        logger.info("Updating user profile: ${userDetails.username}")
-//        return userService.updateUser(userDetails.username, request)
-//            ?.let { UserResponse.toResponse(it) }
-//            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-//    }
-
-//    @GetMapping("/credits")
-//    @Operation(
-//        summary = "Get credit balance",
-//        description = "Returns the current credit balance for the authenticated user",
-//        security = [SecurityRequirement(name = "bearer-auth")]
-//    )
-//    fun getCreditBalance(@AuthenticationPrincipal userDetails: UserDetails): CreditResponse {
-//        logger.info("Fetching credit balance for user: ${userDetails.username}")
-//        return userService.getCreditBalance(userDetails.username)
-//    }
-
-//    @GetMapping("/usage-history")
-//    @Operation(
-//        summary = "Get usage history",
-//        description = "Returns the API usage history for the authenticated user",
-//        security = [SecurityRequirement(name = "bearer-auth")]
-//    )
-//    fun getUsageHistory(
-//        @AuthenticationPrincipal userDetails: UserDetails,
-//        @RequestParam(required = false) from: String?,
-//        @RequestParam(required = false) to: String?
-//    ): List<UsageRecord> {
-//        logger.info("Fetching usage history for user: ${userDetails.username}")
-//        return userService.getUsageHistory(userDetails.username, from, to)
-//    }
 
     // Admin endpoints below
     @GetMapping
@@ -110,22 +63,6 @@ class UserController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
     }
 
-//    @PutMapping("/{id}/credits")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @Operation(
-//        summary = "Adjust user credits",
-//        description = "Adjusts the credit balance for a user. Requires ADMIN role.",
-//        security = [SecurityRequirement(name = "bearer-auth")]
-//    )
-//    fun adjustCredits(
-//        @PathVariable id: Long,
-//        @RequestBody request: CreditAdjustmentRequest
-//    ): UserResponse {
-//        logger.info("Admin: Adjusting credits for user ID: $id")
-//        return userService.adjustCredits(id, request.amount)
-//            ?.let { UserResponse.toResponse(it) }
-//            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
-//    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

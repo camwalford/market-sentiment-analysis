@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
+import jakarta.persistence.*
+
 @Entity
 @Table(name = "users")
 data class User(
@@ -29,8 +31,12 @@ data class User(
     var credits: Int = 20, // Default to 20 credits
 
     @Column(nullable = false)
-    var requests: Int = 0 // Default to 0 requests
+    var requests: Int = 0, // Default to 0 requests
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val refreshTokens: MutableList<RefreshToken> = mutableListOf()
 )
+
 
 enum class Role {
     USER, ADMIN, BANNED
