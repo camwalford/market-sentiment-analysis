@@ -53,9 +53,7 @@ class SecurityConfiguration(
                         "/api/auth/validate",
                         "/api/auth/check-username/**",
                         "/api/auth/check-email/**"
-
                     ).permitAll()
-
                     // Protected endpoints
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
                     .hasAnyRole("USER", "ADMIN")
@@ -74,9 +72,12 @@ class SecurityConfiguration(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000", "http://web-dashboard-service:3000, https://stocks.camwalford.me")
+        configuration.allowedOrigins = listOf(
+            "http://localhost:3000",
+            "http://web-dashboard-service:3000",
+            "https://stocks.camwalford.me"
+        )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        // Update allowed headers to include Authorization for Swagger
         configuration.allowedHeaders = listOf(
             "Content-Type",
             "Authorization",
