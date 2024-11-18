@@ -74,16 +74,16 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:prod-db}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb_prod}
-    username: ${MYSQL_USER_PROD:prod_user}
-    password: ${MYSQL_PASSWORD_PROD:prod_password}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb}
+    username: ${MYSQL_USER_PROD:admin}
+    password: ${MYSQL_PASSWORD_PROD:admin}
   jwt:
-    key: ${JWT_KEY_PROD:prod-random-key}
+    key: ${JWT_KEY:prod-random-key}
   app:
     cookie:
-      domain: ${COOKIE_DOMAIN_PROD:yourproductiondomain.com}
+      domain: ${COOKIE_DOMAIN_PROD:stocks.camwalford.me}
       secure: ${COOKIE_SECURE_PROD:true}
-      same-site: ${COOKIE_SAME_SITE_PROD:Strict}
+      same-site: ${COOKIE_SAME_SITE_PROD:Lax}
 
 server:
   port: ${PORT:80}

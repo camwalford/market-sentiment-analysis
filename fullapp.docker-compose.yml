@@ -71,6 +71,19 @@ services:
     ports:
       - '${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT:-8082}'
 
+  web-dashboard-service:
+    build:
+      context: web-dashboard-service
+      dockerfile: Dockerfile
+      args: # Pass the api url as a build argument because node.js can't access container environment variables it seems
+        REACT_APP_API_URL: '${BACKEND_API_SERVICE_URL}:${BACKEND_API_SERVICE_PORT}/api'
+    environment:
+      PORT: ${WEB_DASHBOARD_SERVICE_PORT:-3000}
+    ports:
+      - '${WEB_DASHBOARD_SERVICE_PORT:-3000}:80'
+    depends_on:
+      - backend-api-service
+
 volumes:
   mysql-data:
     name: mysql-data  # Explicitly name the volume
