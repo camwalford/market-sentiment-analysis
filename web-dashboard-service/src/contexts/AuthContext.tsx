@@ -31,6 +31,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             });
             return true;
         } catch (error) {
+            console.log("Session validation failed:", error);
             setAuth({
                 user: null,
                 loading: false,

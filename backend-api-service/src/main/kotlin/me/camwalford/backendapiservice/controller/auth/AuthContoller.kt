@@ -117,7 +117,7 @@ class AuthController(
         return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/validate")
+    @PostMapping("/validate")
     @Operation(summary = "Validate session", description = "Validates the current session and returns user data")
     fun validateSession(@AuthenticationPrincipal userDetails: UserDetails?): ResponseEntity<UserResponse> {
         if (userDetails == null) {
