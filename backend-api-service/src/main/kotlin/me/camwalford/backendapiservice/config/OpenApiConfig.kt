@@ -39,7 +39,7 @@ class OpenApiConfig {
             )
             .addServersItem( // Add the server configuration
                 Server()
-                    .url("https://api.stocks.camwalford.me") // Set the base URL for Swagger
+                    .url("https://api.camwalford.me") // Set the base URL for Swagger
                     .description("Production server")
             )
             .addServersItem(
