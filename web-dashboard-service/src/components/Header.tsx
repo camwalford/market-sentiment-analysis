@@ -1,17 +1,16 @@
-// components/Header.tsx
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
-import {Link} from "react-router-dom";
 
 const UserInfo: React.FC<{ email: string; credits: number }> = ({ email, credits }) => (
-    <div className="flex items-center space-x-4">
+    <Link to="/profile" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
         <FaUserCircle className="text-3xl" />
         <div className="flex flex-col items-start">
             <span className="text-sm font-semibold">{email}</span>
             <span className="text-sm">Credits: {credits}</span>
         </div>
-    </div>
+    </Link>
 );
 
 const LogoutButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (

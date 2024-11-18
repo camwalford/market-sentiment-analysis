@@ -2,6 +2,7 @@
 import React from 'react';
 import { UserRole } from '../types/auth';
 import SuspenseWrapper from '../components/SuspenseWrapper';
+import UserProfile from "../components/UserProfile";
 
 // Lazy load components
 const StockSentimentDashboard = React.lazy(() => import('../components/StockSentimentDashboard'));
@@ -32,6 +33,11 @@ export const RouteConfig = {
             element: <SuspenseWrapper><AdminDashboard /></SuspenseWrapper>,
             roles: ['ADMIN'] as UserRole[],
         },
+        {
+            path: '/profile',
+            element: <SuspenseWrapper><UserProfile /></SuspenseWrapper>,
+            roles: ['USER', 'ADMIN'] as UserRole[],
+        }
     ] as const,
 } as const;
 
