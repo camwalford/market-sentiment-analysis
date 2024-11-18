@@ -33,6 +33,16 @@ class UserService(
         return savedUser
     }
 
+    fun isUsernameAvailable(username: String): Boolean {
+        logger.info("Checking if username is available: $username")
+        return userRepository.findUserByUsername(username) == null
+    }
+
+    fun isEmailAvailable(email: String): Boolean {
+        logger.info("Checking if email is available: $email")
+        return userRepository.findByEmail(email) == null
+    }
+
     fun findByEmail(email: String): User? {
         logger.info("Finding user with email: $email")
         return userRepository.findByEmail(email)

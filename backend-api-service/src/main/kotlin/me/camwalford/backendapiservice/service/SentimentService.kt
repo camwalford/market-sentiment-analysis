@@ -62,6 +62,15 @@ class SentimentService(
                 "Sentiment analysis failed: ${ex.message}"
             )
         }
+        try {
+            userService.deductCredits(user, 1)
+        } catch (ex: Exception) {
+            logger.error("Failed to decrement credits: ${ex.message}")
+            throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to decrement credits: ${ex.message}"
+            )
+        }
         val sentimentResponse = SentimentResponse(sentimentResults, user.credits - 1)
         return sentimentResponse
     }

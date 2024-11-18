@@ -1,10 +1,8 @@
 package me.camwalford.backendapiservice.controller.auth
-import me.camwalford.backendapiservice.controller.user.UserResponse
-import java.io.Serializable
 
+// AuthenticationResponse.kt
+@io.swagger.v3.oas.annotations.media.Schema(description = "Authentication response payload")
 data class AuthenticationResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val user: UserResponse
-) : Serializable
-
+    @io.swagger.v3.oas.annotations.media.Schema(description = "User details", required = true)
+    val user: me.camwalford.backendapiservice.controller.user.UserResponse
+) : java.io.Serializable

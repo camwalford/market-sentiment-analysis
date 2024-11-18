@@ -17,7 +17,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 class SecurityConfiguration(
     private val authenticationProvider: AuthenticationProvider
 ) {
@@ -25,7 +25,6 @@ class SecurityConfiguration(
     fun securityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter
-
     ): DefaultSecurityFilterChain =
         http
             .csrf { it.disable() }
@@ -33,15 +32,29 @@ class SecurityConfiguration(
             .authorizeHttpRequests {
                 it
                     .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
-                    .requestMatchers("/api/auth/login", "/api/auth/refresh", "/error", "/api/auth/logout", "/api/auth/register")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .permitAll()
+                    // Swagger UI and OpenAPI endpoints
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html/*",
+                        "/webjars/**"
+                    ).permitAll()
+                    // Auth endpoints
+                    .requestMatchers(
+                        "/api/auth/login",
+                        "/api/auth/refresh",
+                        "/error",
+                        "/api/auth/logout",
+                        "/api/auth/register"
+                    ).permitAll()
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    // Protected endpoints
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
-
+                    // Any other request needs authentication
+                    .anyRequest().authenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -50,15 +63,21 @@ class SecurityConfiguration(
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 
-
-    //TODO: Add allowed origins to application.yaml and inject them here
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:3000, http://web-dashboard-service:3000")  // Allow your frontend origin
+        configuration.allowedOrigins = listOf("http://localhost:3000", "http://web-dashboard-service:3000")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        configuration.allowedHeaders = listOf("Authorization", "Content-Type", "*")
+        // Update allowed headers to include Authorization for Swagger
+        configuration.allowedHeaders = listOf(
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+            "Accept",
+            "Origin"
+        )
         configuration.allowCredentials = true
+        configuration.exposedHeaders = listOf("Set-Cookie")
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)

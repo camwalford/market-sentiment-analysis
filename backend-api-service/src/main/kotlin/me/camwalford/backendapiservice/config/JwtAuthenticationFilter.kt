@@ -29,9 +29,8 @@ class JwtAuthenticationFilter(
         try {
             logger.info("Processing request to: ${request.requestURI}")
 
-            val authHeader: String? = request.getHeader("Authorization")
-            if (!authHeader.doesNotContainBearerToken()) {
-                val jwtToken = authHeader!!.extractTokenValue()
+            val jwtToken = extractTokenFromCookie(request)
+            if (jwtToken != null) {
                 val username = tokenService.extractUsername(jwtToken)
 
                 if (username != null && SecurityContextHolder.getContext().authentication == null) {
@@ -46,7 +45,7 @@ class JwtAuthenticationFilter(
                     }
                 }
             } else {
-                logger.info("Authorization header missing or does not contain Bearer token")
+                logger.info("JWT token not found in cookies")
             }
         } catch (e: Exception) {
             logger.error("Error processing JWT token", e)
@@ -55,9 +54,10 @@ class JwtAuthenticationFilter(
         }
     }
 
-    private fun String?.doesNotContainBearerToken() = this == null || !this.startsWith("Bearer ")
-
-    private fun String.extractTokenValue() = this.substringAfter("Bearer ")
+    private fun extractTokenFromCookie(request: HttpServletRequest): String? {
+        val cookie = request.cookies?.find { it.name == "access_token" }
+        return cookie?.value
+    }
 
     private fun updateContext(foundUser: UserDetails, request: HttpServletRequest) {
         val authToken = UsernamePasswordAuthenticationToken(foundUser, null, foundUser.authorities)

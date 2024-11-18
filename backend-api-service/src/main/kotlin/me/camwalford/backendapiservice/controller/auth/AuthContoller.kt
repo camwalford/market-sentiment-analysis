@@ -1,56 +1,127 @@
 package me.camwalford.backendapiservice.controller.auth
 
-import me.camwalford.backendapiservice.controller.user.UserRequest
-import me.camwalford.backendapiservice.controller.user.UserResponse
-import me.camwalford.backendapiservice.repository.RefreshTokenRepository
-import me.camwalford.backendapiservice.service.AuthenticationService
-import me.camwalford.backendapiservice.service.UserService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import org.slf4j.LoggerFactory
+import me.camwalford.backendapiservice.controller.user.UserRequest
+import me.camwalford.backendapiservice.controller.user.UserResponse
+import me.camwalford.backendapiservice.service.AuthenticationService
+import me.camwalford.backendapiservice.service.UserService
+import org.springframework.http.HttpStatus
 
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication", description = "Authentication and authorization operations")
 class AuthController(
     private val authenticationService: AuthenticationService,
-    private val refreshTokenRepository: RefreshTokenRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    private val request: HttpServletRequest
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(AuthController::class.java)
+    private val logger = LoggerFactory.getLogger(AuthController::class.java)
 
     @PostMapping("/register")
-    fun create(@RequestBody userRequest: UserRequest): UserResponse {
-        logger.info("Registering user with email: ${userRequest.email}")
-        val user = userService.createUser(userRequest.toModel())
-            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create user.")
-        return UserResponse.toResponse(user)
+    @Operation(
+        summary = "Register new user",
+        description = "Creates a new user account in the system. No authentication required."
+    )
+    @ApiResponses(value = [
+        ApiResponse(
+            responseCode = "200",
+            description = "Successfully registered user",
+            content = [Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = Schema(implementation = UserResponse::class)
+            )]
+        ),
+        ApiResponse(responseCode = "400", description = "Invalid request - Username/email already exists or invalid data")
+    ])
+    fun register(@RequestBody userRequest: UserRequest): UserResponse {
+        logger.info("Registering new user with email: ${userRequest.email}")
+        return userService.createUser(userRequest.toModel())
+            ?.let { UserResponse.toResponse(it) }
+            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create user")
+    }
+
+    @GetMapping("/check-username/{username}")
+    @Operation(
+        summary = "Check username availability",
+        description = "Checks if a username is available for registration. No authentication required."
+    )
+    fun checkUsername(@PathVariable username: String): Boolean {
+        logger.info("Checking username availability: $username")
+        return userService.isUsernameAvailable(username)
+    }
+
+    @GetMapping("/check-email/{email}")
+    @Operation(
+        summary = "Check email availability",
+        description = "Checks if an email is available for registration. No authentication required."
+    )
+    fun checkEmail(@PathVariable email: String): Boolean {
+        logger.info("Checking email availability: $email")
+        return userService.isEmailAvailable(email)
     }
 
     @PostMapping("/login")
-    fun authenticate(@RequestBody authRequest: AuthenticationRequest): AuthenticationResponse {
-        logger.info("Authenticating user with username: ${authRequest.username}")
-        return authenticationService.authentication(authRequest)
+    @Operation(
+        summary = "Login",
+        description = "Authenticates user and returns tokens in HTTP-only cookies. No authentication required."
+    )
+    @ApiResponses(value = [
+        ApiResponse(
+            responseCode = "200",
+            description = "Successfully authenticated",
+            content = [Content(schema = Schema(implementation = AuthenticationResponse::class))]
+        ),
+        ApiResponse(responseCode = "401", description = "Invalid credentials")
+    ])
+    fun login(@RequestBody request: AuthenticationRequest): AuthenticationResponse {
+        logger.info("Login attempt for username: ${request.username}")
+        return authenticationService.authentication(request)
     }
 
     @PostMapping("/refresh")
-    fun refreshAccessToken(@RequestBody request: RefreshTokenRequest): TokenResponse {
-        logger.info("Refreshing access token with refresh token: ${request.token}")
-        return authenticationService.refreshAccessToken(request.token)
-            ?.mapToTokenResponse()
-            ?: throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid refresh token.")
+    @Operation(
+        summary = "Refresh token",
+        description = "Generates new access token using refresh token from cookie. Requires valid refresh token."
+    )
+    fun refreshToken(): TokenResponse {
+        val refreshToken = request.cookies?.find { it.name == "refresh_token" }?.value
+            ?: throw ResponseStatusException(HttpStatus.FORBIDDEN, "Refresh token not found")
+
+        return authenticationService.refreshAccessToken(refreshToken)
+            ?.let { TokenResponse(it) }
+            ?: throw ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid refresh token")
     }
 
     @PostMapping("/logout")
-    fun logout(@RequestBody request: RefreshTokenRequest): ResponseEntity<Void> {
-        logger.info("Logging out user with refresh token: ${request.token}")
-        refreshTokenRepository.deleteByToken(request.token)
+    @Operation(
+        summary = "Logout",
+        description = "Invalidates tokens and clears authentication cookies. Requires authentication."
+    )
+    fun logout(): ResponseEntity<Void> {
+        authenticationService.logout(request)
         return ResponseEntity.noContent().build()
     }
 
-    private fun String.mapToTokenResponse(): TokenResponse =
-        TokenResponse(token = this)
+    @PostMapping("/validate")
+    @Operation(
+        summary = "Validate token",
+        description = "Validates the current access token. Requires authentication."
+    )
+    fun validateToken(): ResponseEntity<Void> {
+        // If the request reaches here, the token is valid (due to JWT filter)
+        return ResponseEntity.ok().build()
+    }
 }

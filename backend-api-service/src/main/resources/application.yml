@@ -1,6 +1,9 @@
 spring:
   application:
     name: backend-api-service
+  config:
+    activate:
+      on-profile: default
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb}
     username: ${MYSQL_USER:admin}
@@ -9,7 +12,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update # adjusts the database schema as changes are made to the JPA entities
+      ddl-auto: update
   docker:
     compose:
       enabled: false
@@ -28,17 +31,59 @@ cors:
   allowed-origins:
     - ${WEB_DASHBOARD_SERVICE_URL:http://localhost:3000}
 
-
 jwt:
-  key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==} # Base64 encoded key, default is this random key for development
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000} #1 hour
-  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000} #24 hours
+  key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
+
+app:
+  cookie:
+    domain: ${COOKIE_DOMAIN:localhost}
+    secure: ${COOKIE_SECURE:true}
+    same-site: ${COOKIE_SAME_SITE:Lax}
 
 server:
   port: ${PORT:8080}
 
 logging:
-    level:
-      org:
-        springframework:
-          security: DEBUG
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb_dev}
+    username: ${MYSQL_USER_DEV:dev_user}
+    password: ${MYSQL_PASSWORD_DEV:dev_password}
+  jwt:
+    key: ${JWT_KEY_DEV:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
+  app:
+    cookie:
+      domain: ${COOKIE_DOMAIN_DEV:localhost}
+      secure: ${COOKIE_SECURE_DEV:false}
+      same-site: ${COOKIE_SAME_SITE_DEV:Lax}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:prod-db}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb_prod}
+    username: ${MYSQL_USER_PROD:prod_user}
+    password: ${MYSQL_PASSWORD_PROD:prod_password}
+  jwt:
+    key: ${JWT_KEY_PROD:prod-random-key}
+  app:
+    cookie:
+      domain: ${COOKIE_DOMAIN_PROD:yourproductiondomain.com}
+      secure: ${COOKIE_SECURE_PROD:true}
+      same-site: ${COOKIE_SAME_SITE_PROD:Strict}
+
+server:
+  port: ${PORT:80}

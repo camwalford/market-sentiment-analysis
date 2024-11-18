@@ -1,37 +1,37 @@
 package me.camwalford.backendapiservice.controller.sentiment
 
-import me.camwalford.backendapiservice.service.SentimentAnalysisService
-import me.camwalford.backendapiservice.service.UserService
-import me.camwalford.backendapiservice.service.CompanyNewsService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import me.camwalford.backendapiservice.service.SentimentService
-import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
-
+import org.slf4j.LoggerFactory
 
 @RestController
 @RequestMapping("/api/sentiment")
+@Tag(name = "Sentiment Analysis", description = "Sentiment analysis operations")
+@SecurityRequirement(name = "bearer-auth")
 class SentimentController(
     private val sentimentService: SentimentService
 ) {
     private val logger = LoggerFactory.getLogger(SentimentController::class.java)
 
-    @PostMapping
-    fun getSentiment(
+
+    @PostMapping("/analyze")
+    @Operation(
+        summary = "Detailed sentiment analysis",
+        description = "Performs detailed sentiment analysis with customizable parameters. Costs 3 credits."
+    )
+    fun analyzeSentiment(
         @AuthenticationPrincipal userDetails: UserDetails,
         @RequestBody request: SentimentRequest
-    ): ResponseEntity<SentimentResponse> {
-        logger.info("Received sentiment request for ticker: ${request.ticker} by user: ${userDetails.username}")
-        val response = sentimentService.getSentiment(userDetails, request)
-        val responseEntity = ResponseEntity.ok(response)
-        val context = userDetails.username
-        return responseEntity
+    ): SentimentResponse {
+        logger.info("Detailed sentiment analysis for ticker: ${request.ticker} by user: ${userDetails.username}")
+        return sentimentService.getSentiment(userDetails, request)
     }
+
 }
-
-
