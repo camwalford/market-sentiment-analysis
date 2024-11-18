@@ -117,9 +117,13 @@ class AuthController(
         return ResponseEntity.noContent().build()
     }
 
-    @PostMapping("/validate")
+    @GetMapping("/validate")
     @Operation(summary = "Validate session", description = "Validates the current session and returns user data")
-    fun validateSession(@AuthenticationPrincipal userDetails: UserDetails): ResponseEntity<UserResponse> {
+    fun validateSession(@AuthenticationPrincipal userDetails: UserDetails?): ResponseEntity<UserResponse> {
+        if (userDetails == null) {
+            logger.error("No userDetails found in the authentication principal.")
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        }
         val user = userService.findByUsername(userDetails.username)
         if (user == null) {
             logger.warn("User not found for username: ${userDetails.username}")
@@ -128,4 +132,5 @@ class AuthController(
         logger.info("Session validated for user: ${user.username}")
         return ResponseEntity.ok(UserResponse.toResponse(user))
     }
+
 }

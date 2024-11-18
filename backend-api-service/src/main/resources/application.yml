@@ -30,6 +30,7 @@ sentiment:
 cors:
   allowed-origins:
     - ${WEB_DASHBOARD_SERVICE_URL:http://localhost:3000}
+    - https://stocks.camwalford.me
 
 jwt:
   key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}

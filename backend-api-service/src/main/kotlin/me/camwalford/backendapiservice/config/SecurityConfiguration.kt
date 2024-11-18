@@ -33,6 +33,7 @@ class SecurityConfiguration(
             .cors { it.configurationSource(corsConfigurationSource()) }
             .authorizeHttpRequests {
                 it
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                     // Swagger UI and OpenAPI endpoints
                     .requestMatchers(
@@ -54,7 +55,7 @@ class SecurityConfiguration(
                         "/api/auth/check-email/**"
 
                     ).permitAll()
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                     // Protected endpoints
                     .requestMatchers(HttpMethod.POST, "/api/sentiment")
                     .hasAnyRole("USER", "ADMIN")
@@ -62,8 +63,6 @@ class SecurityConfiguration(
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/user/**")
                     .hasRole("ADMIN")
-                    // Any other request needs authentication
-                    .anyRequest().authenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
