@@ -2,6 +2,7 @@
 import React from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
+import {Link} from "react-router-dom";
 
 const UserInfo: React.FC<{ email: string; credits: number }> = ({ email, credits }) => (
     <div className="flex items-center space-x-4">
@@ -25,19 +26,18 @@ const LogoutButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 );
 
 const Logo: React.FC = () => (
-    <div className="flex items-center space-x-3">
+    <Link to="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
         <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center">
             <span className="text-blue-800 font-bold text-xl">S</span>
         </div>
         <h1 className="text-2xl font-bold tracking-wide">
-            Stock Sentiment Dashboard
+            Stocker Sentiment Analysis
         </h1>
-    </div>
+    </Link>
 );
 
 const Header: React.FC = () => {
     const { auth, handleLogout } = useAuth();
-
     return (
         <header className="p-4 bg-gradient-to-r from-blue-800 to-indigo-800 
                           text-white flex justify-between items-center shadow-md">
@@ -46,7 +46,7 @@ const Header: React.FC = () => {
             {auth.user && (
                 <div className="flex items-center space-x-4">
                     <UserInfo
-                        email={auth.user.email}
+                        email={auth.user.username}
                         credits={auth.user.credits}
                     />
                     <LogoutButton onClick={handleLogout} />
