@@ -1,6 +1,5 @@
 // components/UserProfile.tsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useAuthFetch } from '../hooks/useAuthFetch';
 import API_URL from '../config/API';
 
@@ -12,19 +11,16 @@ interface UserProfileData {
     email: string;
     role: string;
     credits: number;
-    requests: number;
+    totalRequests: number;
 }
 
 const UserProfile: React.FC = () => {
     const [profile, setProfile] = useState<UserProfileData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { auth } = useAuth();
     const { fetchWithAuth } = useAuthFetch();
 
-    useEffect(() => {
-        fetchProfile();
-    }, []);
+
 
     const fetchProfile = async () => {
         try {
@@ -39,6 +35,13 @@ const UserProfile: React.FC = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchProfile().catch(err => {
+            console.error('Error fetching user profile:', err);
+            setError('Failed to fetch user profile');
+        });
+    }, []);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -76,7 +79,7 @@ const UserProfile: React.FC = () => {
                     <label className="block text-gray-700 text-sm font-bold mb-2">
                         Total Requests
                     </label>
-                    <p className="text-gray-700">{profile.requests}</p>
+                    <p className="text-gray-700">{profile.totalRequests}</p>
                 </div>
             </div>
         </div>

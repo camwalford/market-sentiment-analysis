@@ -24,14 +24,7 @@ data class UserResponse(
         example = "100",
         minimum = "0"
     )
-    val credits: Int,
-
-    @io.swagger.v3.oas.annotations.media.Schema(
-        description = "Number of API requests made",
-        example = "5",
-        minimum = "0"
-    )
-    val requests: Int
+    val credits: Int
 ) : java.io.Serializable {
     companion object {
         fun toResponse(user: me.camwalford.backendapiservice.model.User): UserResponse = UserResponse(
@@ -39,8 +32,7 @@ data class UserResponse(
             username = user.username,
             email = user.email,
             role = user.role,
-            credits = user.credits,
-            requests = user.requests
+            credits = user.credits
         )
     }
 }

@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = -1,
@@ -30,12 +30,17 @@ data class User(
     @Column(nullable = false)
     var credits: Int = 20, // Default to 20 credits
 
-    @Column(nullable = false)
-    var requests: Int = 0, // Default to 0 requests
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val refreshTokens: MutableList<RefreshToken> = mutableListOf(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val refreshTokens: MutableList<RefreshToken> = mutableListOf()
-)
+    val requests: MutableList<Request> = mutableListOf()
+
+){
+    override fun toString(): String {
+        return "User(id=$id, username='$username', email='$email', role=$role, credits=$credits)"
+    }
+}
 
 
 enum class Role {

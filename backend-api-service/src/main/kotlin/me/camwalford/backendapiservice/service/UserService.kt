@@ -6,12 +6,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import me.camwalford.backendapiservice.model.User
+import me.camwalford.backendapiservice.repository.RequestRepository
 import me.camwalford.backendapiservice.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val requestRepository: RequestRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
     private val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
@@ -88,13 +90,6 @@ class UserService(
             throw Exception("User does not have enough credits")
         }
         user.credits -= amount
-        userRepository.save(user)
-    }
-
-    @Transactional
-    fun incrementRequests(user: User) {
-        logger.info("Incrementing requests for user with id: ${user.id}")
-        user.requests += 1
         userRepository.save(user)
     }
 }

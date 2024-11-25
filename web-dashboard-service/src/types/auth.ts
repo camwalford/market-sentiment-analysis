@@ -7,7 +7,7 @@ export interface User {
     email: string;
     role: UserRole;
     credits: number;
-    requests: number;
+    totalRequests: number;
 }
 
 export interface AuthState {

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import me.camwalford.backendapiservice.service.RequestService
 import me.camwalford.backendapiservice.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -18,7 +19,8 @@ import org.springframework.http.HttpStatus
 @RequestMapping("/api/user")
 @Tag(name = "Users", description = "User management operations")
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val requestService: RequestService
 ) {
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
@@ -27,12 +29,11 @@ class UserController(
     @Operation(
         summary = "Get current user",
         description = "Returns the profile of the currently authenticated user",
-        security = [SecurityRequirement(name = "bearer-auth")]
+        security = [SecurityRequirement(name = "bearer-auth")] // For swagger
     )
-    fun getCurrentUser(@AuthenticationPrincipal userDetails: UserDetails): UserResponse {
-        logger.info("Fetching current user profile: ${userDetails.username}")
-        return userService.findByUsername(userDetails.username)
-            ?.let { UserResponse.toResponse(it) }
+    fun getCurrentUser(@AuthenticationPrincipal userDetails: UserDetails): UserStatsResponse {
+        logger.info("Fetching current user stat profile: ${userDetails.username}")
+        return requestService.getUserStatsByUsername(userDetails.username)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
     }
 
@@ -48,6 +49,31 @@ class UserController(
     fun listAll(): List<UserResponse> {
         logger.info("Admin: Listing all users")
         return userService.findAll().map { UserResponse.toResponse(it) }
+    }
+
+
+    @GetMapping("/user-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "List all requests",
+        description = "Returns a list of all requests. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    fun listAllRequests(): List<UserStatsResponse> {
+        logger.info("Admin: Listing all requests")
+        return requestService.getAllUserStats()
+    }
+
+    @GetMapping("/endpoint-requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "List all requests by endpoint",
+        description = "Returns a list of all requests grouped by endpoint. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    fun listAllEndpointRequests(): List<EndpointStatsResponse> {
+        logger.info("Admin: Listing all requests by endpoint")
+        return requestService.getEndpointStats()
     }
 
     @GetMapping("/{id}")

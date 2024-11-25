@@ -21,7 +21,7 @@ data class UserRequest(
         description = "Password",
         required = true,
         example = "password123",
-        minLength = 8
+        minLength = 3
     )
     val password: String,
 

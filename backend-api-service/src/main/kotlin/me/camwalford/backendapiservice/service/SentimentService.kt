@@ -37,7 +37,7 @@ class SentimentService(
                 "User not found"
             )
 
-        userService.incrementRequests(user)
+//        userService.incrementRequests(user)
 
         // Check credits
         if (user.credits <= 0) {
