@@ -94,7 +94,7 @@ jwt:
 
 app:
   cookie:
-    domain: 'stocks.camwalford.me'
+    domain: 'api.camwalford.me'
     secure: ${COOKIE_SECURE:true}
     same-site: ${COOKIE_SAME_SITE:None}
 
