@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode} from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
@@ -11,36 +11,10 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
-    const { auth, validateSession } = useAuth();
+    const { auth } = useAuth();
     const location = useLocation();
-    const [isValidating, setIsValidating] = useState(true);
 
-    useEffect(() => {
-        let isMounted = true;
-
-        const validate = async () => {
-            try {
-                await validateSession();
-                console.log("Session validated successfully");
-            } catch (error) {
-                console.error("Session validation failed:", error);
-            } finally {
-                if (isMounted) {
-                    setIsValidating(false);
-                }
-            }
-        };
-
-        validate();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [validateSession]);
-
-    console.log("PrivateRoute render", { isValidating, user: auth.user, allowedRoles });
-
-    if (isValidating) {
+    if (auth.loading) {
         console.log("Showing loading screen");
         return <LoadingScreen />;
     }
@@ -51,7 +25,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
     }
 
     if (allowedRoles?.length && !allowedRoles.includes(auth.user.role)) {
-        console.log("User doesn't have required role, redirecting to dashboard");
+        console.log("User doesn't have required role, redirecting to dashboard", auth.user.role, allowedRoles);
         return <Navigate to="/dashboard" replace />;
     }
 

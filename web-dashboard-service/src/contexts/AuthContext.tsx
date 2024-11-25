@@ -41,8 +41,18 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
         }
     }, []);
 
+    useEffect(() => {
+        validateSession().catch(error => {
+            console.error('Error during session validation:', error);
+        });
+    }, [validateSession]);
+
+
+
 
     const handleLogin = async (username: string, password: string) => {
+
+        console.log("handleLogin");
         setAuth(prev => ({ ...prev, loading: true, error: null }));
         try {
             const response = await AuthAPI.login(username, password);
@@ -79,19 +89,13 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
     const handleRegister = async (username: string, email: string, password: string) => {
         setAuth(prev => ({ ...prev, loading: true, error: null }));
         try {
-            const userData = await AuthAPI.register(username, email, password);
-            const isSessionValid = await validateSession();
-
-            if (!isSessionValid) {
-                throw new Error("Registration successful but session validation failed");
-            }
-
-            setAuth({
-                user: userData,
+            await AuthAPI.register(username, email, password);
+            setAuth(prev => ({
+                ...prev,
                 loading: false,
                 error: null,
-            });
-            navigate('/dashboard');
+            }));
+            navigate('/login');
         } catch (error) {
             setAuth(prev => ({
                 ...prev,
@@ -101,6 +105,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             throw error;
         }
     };
+
 
     const updateUserData = useCallback((userData: Partial<User>) => {
         setAuth(prev => ({

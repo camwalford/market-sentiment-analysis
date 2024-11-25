@@ -22,6 +22,7 @@ class SentimentController(
 
 
     @PostMapping("/analyze")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(
         summary = "Detailed sentiment analysis",
         description = "Performs detailed sentiment analysis with customizable parameters. Costs 1 credits."

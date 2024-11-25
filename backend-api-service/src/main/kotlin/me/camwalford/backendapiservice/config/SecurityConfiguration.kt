@@ -54,13 +54,7 @@ class SecurityConfiguration(
                         "/api/auth/check-username/**",
                         "/api/auth/check-email/**"
                     ).permitAll()
-                    // Protected endpoints
-                    .requestMatchers(HttpMethod.POST, "/api/sentiment")
-                    .hasAnyRole("USER", "ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/api/user/me")
-                    .hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/api/user/**")
-                    .hasRole("ADMIN")
+                    .anyRequest().authenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

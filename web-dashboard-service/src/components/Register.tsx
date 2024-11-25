@@ -37,7 +37,6 @@ const Register: React.FC = () => {
                 formData.email,
                 formData.password
             );
-            // Navigation is handled in AuthContext after successful registration
         } catch (error) {
             setError(error instanceof Error ? error.message : 'Registration failed');
         }
