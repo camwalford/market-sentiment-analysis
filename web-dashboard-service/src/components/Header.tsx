@@ -30,7 +30,7 @@ const Logo: React.FC = () => (
             <span className="text-blue-800 font-bold text-xl">S</span>
         </div>
         <h1 className="text-2xl font-bold tracking-wide">
-            Stocker Sentiment Analysis
+            Stock Sentiment Analysis
         </h1>
     </Link>
 );
