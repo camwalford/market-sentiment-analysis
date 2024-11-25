@@ -8,9 +8,9 @@ import {
     CartesianGrid,
     Tooltip,
     Legend,
-    ResponsiveContainer,
+    ResponsiveContainer, Line,
 } from 'recharts';
-import { Search, Calendar, RefreshCw } from 'lucide-react';
+import {Search, Calendar, RefreshCw, TrendingUp} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthFetch } from '../hooks/useAuthFetch';
 
@@ -56,6 +56,12 @@ const StockSentimentDashboard: React.FC = () => {
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const { auth, updateUserData } = useAuth();
     const { fetchWithAuth } = useAuthFetch();
+
+    const [showTrendlines, setShowTrendlines] = useState({
+        positive: false,
+        neutral: false,
+        negative: false
+    });
 
     useEffect(() => {
         transformDataForChart();
@@ -126,6 +132,21 @@ const StockSentimentDashboard: React.FC = () => {
         return date.toISOString();
     };
 
+    const calculateMovingAverage = (data: any[], key: string, period: number = 3) => {
+        return data.map((item, index) => {
+            if (index < period - 1) return { ...item, [`${key}Trend`]: item[key] };
+
+            const sum = data
+                .slice(index - period + 1, index + 1)
+                .reduce((acc, curr) => acc + curr[key], 0);
+
+            return {
+                ...item,
+                [`${key}Trend`]: Number((sum / period).toFixed(2))
+            };
+        });
+    };
+
     const transformDataForChart = () => {
         const days = TIME_PERIODS[timePeriod].days;
         const endDate = new Date();
@@ -148,7 +169,7 @@ const StockSentimentDashboard: React.FC = () => {
             return acc;
         }, {} as Record<string, { date: string; positive: number; neutral: number; negative: number }>);
 
-        const completeChartData = dateRange.map(date => {
+        let completeChartData = dateRange.map(date => {
             const formattedDate = getGroupedDate(new Date(date).getTime(), interval);
             return groupedData[formattedDate] || {
                 date: formatDate(formattedDate),
@@ -158,7 +179,47 @@ const StockSentimentDashboard: React.FC = () => {
             };
         });
 
+        // Calculate moving averages for each sentiment
+        completeChartData = calculateMovingAverage(completeChartData, 'positive');
+        completeChartData = calculateMovingAverage(completeChartData, 'neutral');
+        completeChartData = calculateMovingAverage(completeChartData, 'negative');
+
         setChartData(completeChartData);
+    };
+
+    const TrendlineToggle: React.FC<{
+        sentiment: 'positive' | 'neutral' | 'negative',
+        color: string
+    }> = ({ sentiment, color }) => {
+        const getButtonClasses = () => {
+            const baseClasses = "inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors";
+
+            if (showTrendlines[sentiment]) {
+                switch (sentiment) {
+                    case 'positive':
+                        return `${baseClasses} bg-green-600 text-white`;
+                    case 'neutral':
+                        return `${baseClasses} bg-gray-600 text-white`;
+                    case 'negative':
+                        return `${baseClasses} bg-red-600 text-white`;
+                }
+            }
+
+            return `${baseClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`;
+        };
+
+        return (
+            <button
+                onClick={() => setShowTrendlines(prev => ({
+                    ...prev,
+                    [sentiment]: !prev[sentiment]
+                }))}
+                className={getButtonClasses()}
+            >
+                <TrendingUp size={14} />
+                {sentiment.charAt(0).toUpperCase() + sentiment.slice(1)} Trend
+            </button>
+        );
     };
 
     const CustomTooltip: React.FC<{ active?: boolean; payload?: any; label?: string }> = ({ active, payload, label }) => {
@@ -205,7 +266,8 @@ const StockSentimentDashboard: React.FC = () => {
                     <h2 className="text-2xl font-bold">Stock Sentiment Analysis</h2>
                     {lastUpdated && (
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800">
+                            <span
+                                className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800">
                                 Last updated: {lastUpdated.toLocaleString()}
                             </span>
                             <button
@@ -213,11 +275,12 @@ const StockSentimentDashboard: React.FC = () => {
                                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                                 title="Refresh data"
                             >
-                                <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
+                                <RefreshCw size={16} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`}/>
                             </button>
                         </div>
                     )}
                 </div>
+
                 <div className="p-6">
                     <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 mb-6">
                         <div className="flex-1 min-w-[200px]">
@@ -281,12 +344,17 @@ const StockSentimentDashboard: React.FC = () => {
                             </button>
                         </div>
                     </form>
+                    <div className="mb-4 flex flex-wrap gap-2">
+                        <TrendlineToggle sentiment="positive" color="green-600"/>
+                        <TrendlineToggle sentiment="neutral" color="gray-600"/>
+                        <TrendlineToggle sentiment="negative" color="red-600"/>
+                    </div>
 
                     <div className="h-[700px] w-full">
                         {chartData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <ComposedChart data={chartData} margin={{top: 20, right: 30, left: 50, bottom: 20}}>
-                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <CartesianGrid strokeDasharray="3 3"/>
                                     <XAxis
                                         dataKey="date"
                                         tick={{fontSize: 12}}
@@ -294,27 +362,63 @@ const StockSentimentDashboard: React.FC = () => {
                                         textAnchor="end"
                                         height={60}
                                     />
-                                    <YAxis allowDecimals={false} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend />
-                                    <Bar dataKey="positive" fill="rgba(74, 222, 128, 0.6)" name="Positive Sentiment" />
-                                    <Bar dataKey="neutral" fill="rgba(156, 163, 175, 0.6)" name="Neutral Sentiment" />
-                                    <Bar dataKey="negative" fill="rgba(248, 113, 113, 0.6)" name="Negative Sentiment" />
+                                    <YAxis allowDecimals={false}/>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                    <Legend/>
+                                    <Bar dataKey="positive" fill="rgba(74, 222, 128, 0.6)" name="Positive Sentiment"/>
+                                    <Bar dataKey="neutral" fill="rgba(156, 163, 175, 0.6)" name="Neutral Sentiment"/>
+                                    <Bar dataKey="negative" fill="rgba(248, 113, 113, 0.6)" name="Negative Sentiment"/>
+
+                                    {showTrendlines.positive && (
+                                        <Line
+                                            type="monotone"
+                                            dataKey="positiveTrend"
+                                            stroke="#22c55e"
+                                            strokeWidth={2}
+                                            dot={false}
+                                            name="Positive Trend"
+                                        />
+                                    )}
+                                    {showTrendlines.neutral && (
+                                        <Line
+                                            type="monotone"
+                                            dataKey="neutralTrend"
+                                            stroke="#4b5563"
+                                            strokeWidth={2}
+                                            dot={false}
+                                            name="Neutral Trend"
+                                        />
+                                    )}
+                                    {showTrendlines.negative && (
+                                        <Line
+                                            type="monotone"
+                                            dataKey="negativeTrend"
+                                            stroke="#dc2626"
+                                            strokeWidth={2}
+                                            dot={false}
+                                            name="Negative Trend"
+                                        />
+                                    )}
                                 </ComposedChart>
                             </ResponsiveContainer>
                         ) : (
                             <div className="h-full flex items-center justify-center">
                                 <div className="text-center text-gray-500">
                                     <p className="text-lg mb-2">No data available</p>
-                                    <p className="text-sm">Try adjusting your query parameters or selecting a different time period</p>
+                                    <p className="text-sm">Try adjusting your query parameters or selecting a different
+                                        time period</p>
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+
+
         </div>
-    );
+
+    )
+        ;
 };
 
 export default StockSentimentDashboard;
