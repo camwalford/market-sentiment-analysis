@@ -30,7 +30,7 @@ sentiment:
 cors:
   allowed-origins:
     - ${WEB_DASHBOARD_SERVICE_URL:http://localhost:3000}
-    - https://stocks.camwalford.me
+    - 'https://stocks.camwalford.me'
 
 jwt:
   key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
@@ -39,7 +39,7 @@ jwt:
 
 app:
   cookie:
-    domain: ${COOKIE_DOMAIN:stocks.camwalford.me}
+    domain: ${COOKIE_DOMAIN:localhost}
     secure: ${COOKIE_SECURE:true}
     same-site: ${COOKIE_SAME_SITE:None}
 
@@ -54,37 +54,57 @@ logging:
 
 ---
 spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb_dev}
-    username: ${MYSQL_USER_DEV:dev_user}
-    password: ${MYSQL_PASSWORD_DEV:dev_password}
-  jwt:
-    key: ${JWT_KEY_DEV:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
-  app:
-    cookie:
-      domain: ${COOKIE_DOMAIN_DEV:localhost}
-      secure: ${COOKIE_SECURE_DEV:true}
-      same-site: ${COOKIE_SAME_SITE_DEV:Lax}
-
----
-spring:
+  application:
+    name: backend-api-service
   config:
     activate:
       on-profile: prod
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:marketdb}
-    username: ${MYSQL_USER_PROD:admin}
-    password: ${MYSQL_PASSWORD_PROD:admin}
-  jwt:
-    key: ${JWT_KEY:prod-random-key}
-  app:
-    cookie:
-      domain: ${COOKIE_DOMAIN_PROD:stocks.camwalford.me}
-      secure: ${COOKIE_SECURE_PROD:true}
-      same-site: ${COOKIE_SAME_SITE_PROD:None}
+    username: ${MYSQL_USER:admin}
+    password: ${MYSQL_PASSWORD:admin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  docker:
+    compose:
+      enabled: false
+
+finnhub:
+  ingestion:
+    service:
+      url: ${FINNHUB_INGESTION_SERVICE_URL:http://localhost:8081}
+
+sentiment:
+  analysis:
+    service:
+      url: ${BERT_SENTIMENT_ANALYSIS_SERVICE_URL:http://localhost:8082}
+
+cors:
+  allowed-origins:
+    - ${WEB_DASHBOARD_SERVICE_URL:http://localhost:3000}
+    - 'https://stocks.camwalford.me'
+
+jwt:
+  key: ${JWT_KEY:xuvDXJ27YS+YhsZCFqYkGaYz4YfPrPzfi7dHgZSoVIr1S8UETEfDKtE19V2yr88CIL+WQhXcv8vbE2fUaI2R/w==}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
+
+app:
+  cookie:
+    domain: 'stocks.camwalford.me'
+    secure: ${COOKIE_SECURE:true}
+    same-site: ${COOKIE_SAME_SITE:None}
 
 server:
-  port: ${PORT:80}
+  port: ${PORT:8080}
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+---
