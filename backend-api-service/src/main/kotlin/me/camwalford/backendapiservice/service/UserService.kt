@@ -131,7 +131,13 @@ class UserService(
         return true
     }
 
-    fun banUser(user: User) {
+    @Transactional
+    fun banUserById(id: Long): User {
+        val user = findById(id)
+        return banUser(user)
+    }
+    @Transactional
+    fun banUser(user: User): User {
         logger.info("Banning user with id: ${user.id}")
         if (user.role == Role.BANNED) {
             throw InvalidUserOperationException(
@@ -148,6 +154,41 @@ class UserService(
         val bannedUser = user.copy(role = Role.BANNED)
         userRepository.save(bannedUser)
         logger.info("User ${user.username} has been banned")
+        return bannedUser
+    }
+
+    @Transactional
+    fun unbanUserById(id: Long): User {
+        val user = findById(id)
+        return unbanUser(user)
+    }
+
+    @Transactional
+    fun unbanUser(user: User): User {
+        logger.info("Unbanning user with id: ${user.id}")
+        if (user.role != Role.BANNED) {
+            throw InvalidUserOperationException(
+                operation = "unban user",
+                reason = "User is not banned",
+                details = mapOf(
+                    "userId" to user.id,
+                    "username" to user.username,
+                    "currentRole" to user.role
+                )
+            )
+        }
+
+        val unbannedUser = user.copy(role = Role.USER)
+        userRepository.save(unbannedUser)
+        logger.info("User ${user.username} has been unbanned")
+        return unbannedUser
+    }
+
+    @Transactional
+    fun deductCreditsById(id: Long, amount: Int): User {
+        val user = findById(id)
+        deductCredits(user, amount)
+        return user
     }
 
     @Transactional
@@ -180,6 +221,14 @@ class UserService(
         logger.info("Successfully deducted $amount credits from user ${user.username}")
     }
 
+    @Transactional
+    fun addCreditsById(id: Long, amount: Int): User {
+        val user = findById(id)
+        addCredits(user, amount)
+        return user
+    }
+
+    @Transactional
     fun addCredits(user: User, amount: Int) {
         logger.info("Adding $amount credits to user with id: ${user.id}")
 

@@ -37,29 +37,30 @@ class UserController(
         description = "Returns the profile of the currently authenticated user",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "200",
-            description = "User stats retrieved successfully",
-            content = [Content(schema = Schema(implementation = UserStatsResponse::class))]
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "404",
-            description = "User not found",
-            content = [Content(
-                mediaType = "application/problem+json",
-                schema = Schema(implementation = ProblemDetail::class),
-                examples = [
-                    ExampleObject(
-                        name = "userNotFound",
-                        summary = "User not found",
-                        description = "Example of error when user doesn't exist",
-                        value = """
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User stats retrieved successfully",
+                content = [Content(schema = Schema(implementation = UserStatsResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user doesn't exist",
+                            value = """
                         {
                             "type": "https://api.yourservice.com/errors/USER_001",
                             "title": "User Not Found",
@@ -68,11 +69,12 @@ class UserController(
                             "errorCode": "USER_001"
                         }
                         """
-                    )
-                ]
-            )]
-        )
-    ])
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
     fun getCurrentUser(@AuthenticationPrincipal userDetails: UserDetails): UserStatsResponse {
         logger.info("Fetching current user stat profile: ${userDetails.username}")
         return requestService.getUserStatsByUsername(userDetails.username)
@@ -87,29 +89,30 @@ class UserController(
         description = "Returns a list of all users. Requires ADMIN role.",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "200",
-            description = "Users list retrieved successfully",
-            content = [Content(schema = Schema(implementation = List::class))]
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "403",
-            description = "Insufficient permissions",
-            content = [Content(
-                mediaType = "application/problem+json",
-                schema = Schema(implementation = ProblemDetail::class),
-                examples = [
-                    ExampleObject(
-                        name = "insufficientPermissions",
-                        summary = "Insufficient permissions",
-                        description = "Example of error when non-admin tries to access",
-                        value = """
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Users list retrieved successfully",
+                content = [Content(schema = Schema(implementation = List::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "insufficientPermissions",
+                            summary = "Insufficient permissions",
+                            description = "Example of error when non-admin tries to access",
+                            value = """
                         {
                             "type": "https://api.yourservice.com/errors/AUTH_001",
                             "title": "Access Denied",
@@ -118,11 +121,12 @@ class UserController(
                             "errorCode": "AUTH_001"
                         }
                         """
-                    )
-                ]
-            )]
-        )
-    ])
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
     fun listAll(): List<UserResponse> {
         logger.info("Admin: Listing all users")
         return userService.findAll().map { UserResponse.toResponse(it) }
@@ -136,23 +140,25 @@ class UserController(
         description = "Returns a list of all requests. Requires ADMIN role.",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "200",
-            description = "Request statistics retrieved successfully",
-            content = [Content(schema = Schema(implementation = List::class))]
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "403",
-            description = "Insufficient permissions",
-            ref = "#/components/responses/ForbiddenError"
-        )
-    ])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Request statistics retrieved successfully",
+                content = [Content(schema = Schema(implementation = List::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            )
+        ]
+    )
     fun listAllRequests(): List<UserStatsResponse> {
         logger.info("Admin: Listing all requests")
         return requestService.getAllUserStats()
@@ -165,23 +171,25 @@ class UserController(
         description = "Returns a list of all requests grouped by endpoint. Requires ADMIN role.",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "200",
-            description = "Endpoint statistics retrieved successfully",
-            content = [Content(schema = Schema(implementation = List::class))]
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "403",
-            description = "Insufficient permissions",
-            ref = "#/components/responses/ForbiddenError"
-        )
-    ])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Endpoint statistics retrieved successfully",
+                content = [Content(schema = Schema(implementation = List::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            )
+        ]
+    )
     fun listAllEndpointRequests(): List<EndpointStatsResponse> {
         logger.info("Admin: Listing all requests by endpoint")
         return requestService.getEndpointStats()
@@ -194,34 +202,35 @@ class UserController(
         description = "Returns a specific user by ID. Requires ADMIN role.",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "200",
-            description = "User retrieved successfully",
-            content = [Content(schema = Schema(implementation = UserResponse::class))]
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "403",
-            description = "Insufficient permissions",
-            ref = "#/components/responses/ForbiddenError"
-        ),
-        ApiResponse(
-            responseCode = "404",
-            description = "User not found",
-            content = [Content(
-                mediaType = "application/problem+json",
-                schema = Schema(implementation = ProblemDetail::class),
-                examples = [
-                    ExampleObject(
-                        name = "userNotFound",
-                        summary = "User not found",
-                        description = "Example of error when user ID doesn't exist",
-                        value = """
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User retrieved successfully",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
                         {
                             "type": "https://api.yourservice.com/errors/USER_001",
                             "title": "User Not Found",
@@ -230,11 +239,12 @@ class UserController(
                             "errorCode": "USER_001"
                         }
                         """
-                    )
-                ]
-            )]
-        )
-    ])
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
     fun getUserById(@PathVariable id: Long): UserResponse {
         logger.info("Admin: Fetching user with ID: $id")
         return userService.findById(id)
@@ -250,33 +260,34 @@ class UserController(
         description = "Deletes a user account. Requires ADMIN role.",
         security = [SecurityRequirement(name = "bearer-auth")]
     )
-    @ApiResponses(value = [
-        ApiResponse(
-            responseCode = "204",
-            description = "User successfully deleted"
-        ),
-        ApiResponse(
-            responseCode = "401",
-            description = "Not authenticated",
-            ref = "#/components/responses/UnauthorizedError"
-        ),
-        ApiResponse(
-            responseCode = "403",
-            description = "Insufficient permissions",
-            ref = "#/components/responses/ForbiddenError"
-        ),
-        ApiResponse(
-            responseCode = "404",
-            description = "User not found",
-            content = [Content(
-                mediaType = "application/problem+json",
-                schema = Schema(implementation = ProblemDetail::class),
-                examples = [
-                    ExampleObject(
-                        name = "userNotFound",
-                        summary = "User not found",
-                        description = "Example of error when user ID doesn't exist",
-                        value = """
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "User successfully deleted"
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
                         {
                             "type": "https://api.yourservice.com/errors/USER_001",
                             "title": "User Not Found",
@@ -285,11 +296,12 @@ class UserController(
                             "errorCode": "USER_001"
                         }
                         """
-                    )
-                ]
-            )]
-        )
-    ])
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
     fun deleteUser(@PathVariable id: Long): ResponseEntity<Void> {
         logger.info("Admin: Deleting user with ID: $id")
         return if (userService.deleteById(id)) {
@@ -297,5 +309,245 @@ class UserController(
         } else {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/ban")
+    @Operation(
+        summary = "Ban user",
+        description = "Bans a user account, preventing them from using the service. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User successfully banned",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_001",
+                        "title": "User Not Found",
+                        "status": 404,
+                        "detail": "User with ID {id} could not be found",
+                        "errorCode": "USER_001"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "User already banned",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "alreadyBanned",
+                            summary = "User already banned",
+                            description = "Example of error when trying to ban an already banned user",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_005",
+                        "title": "Invalid Operation",
+                        "status": 400,
+                        "detail": "User is already banned",
+                        "errorCode": "USER_005"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
+    fun banUser(@PathVariable id: Long): UserResponse {
+        return userService.banUserById(id).let { UserResponse.toResponse(it) }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/unban")
+    @Operation(
+        summary = "Unban user",
+        description = "Unbans a user account, allowing them to use the service. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User successfully unbanned",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_001",
+                        "title": "User Not Found",
+                        "status": 404,
+                        "detail": "User with ID {id} could not be found",
+                        "errorCode": "USER_001"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
+    fun unbanUser(@PathVariable id: Long): UserResponse {
+        return userService.unbanUserById(id).let { UserResponse.toResponse(it) }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/add-credits")
+    @Operation(
+        summary = "Add credits to user account",
+        description = "Adds credits to a user account. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Credits successfully added to user account",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_001",
+                        "title": "User Not Found",
+                        "status": 404,
+                        "detail": "User with ID {id} could not be found",
+                        "errorCode": "USER_001"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
+    fun addCredits(@PathVariable id: Long, @RequestParam amount: Int): UserResponse {
+        return userService.addCreditsById(id, amount).let { UserResponse.toResponse(it) }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/deduct-credits")
+    @Operation(
+        summary = "Remove credits from user account",
+        description = "Removes credits from a user account. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Credits deducted successfully from user account",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_001",
+                        "title": "User Not Found",
+                        "status": 404,
+                        "detail": "User with ID {id} could not be found",
+                        "errorCode": "USER_001"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
+    fun deductCredits(@PathVariable id: Long, @RequestParam amount: Int): UserResponse {
+        return userService.deductCreditsById(id, amount).let { UserResponse.toResponse(it) }
     }
 }
