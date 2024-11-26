@@ -149,4 +149,7 @@ export const Messages = {
 
     // API Error Messages
     API_DEFAULT_ERROR: 'An unexpected error occurred',
+
+    // Loading Spinner
+    PROCESSING: 'Processing...',
 };
