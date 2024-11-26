@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAuthFetch } from '../hooks/useAuthFetch';
 import API_URL from '../config/API';
 import {UserRole} from "../types/auth";
+import { Messages } from '../messages/eng';
 
 const USER_API_URL = API_URL + '/user';
 const USER_REQUESTS_API_URL = USER_API_URL + '/user-requests';
@@ -44,7 +45,7 @@ const AdminDashboard: React.FC = () => {
             setUsers(data);
             setError(null);
         } catch (err) {
-            setError('Failed to fetch users');
+            setError(Messages.FETCH_USERS_ERROR);
         } finally {
             setLoading(false);
         }
@@ -62,43 +63,43 @@ const AdminDashboard: React.FC = () => {
             setEndpoints(data);
             setError(null);
         } catch (err) {
-            setError('Failed to fetch endpoints');
+            setError(Messages.FETCH_ENDPOINTS_ERROR);
         } finally {
             setLoading(false);
         }
     };
 
     const deleteUser = async (userId: number) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
+        if (window.confirm(Messages.DELETE_USER_CONFIRMATION)) {
             try {
                 await fetchWithAuth(`${USER_API_URL}/${userId}`, {
                     method: 'DELETE',
                 });
                 setUsers(users.filter(user => user.userId !== userId));
             } catch (err) {
-                setError('Failed to delete user');
+                setError(Messages.DELETE_USER_ERROR);
             }
         }
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div>{Messages.LOADING_MESSAGE}</div>;
+    if (error) return <div>{Messages.ERROR_PREFIX}{error}</div>;
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-4">{Messages.ADMIN_DASHBOARD_TITLE}</h1>
             <div className="mb-4">
-                <h2 className="text-xl font-semibold">User Management</h2>
+                <h2 className="text-xl font-semibold">{Messages.USER_MANAGEMENT_TITLE}</h2>
                 <table className="min-w-full bg-white">
                     <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Username</th>
-                        <th className="py-2 px-4 border-b">Email</th>
-                        <th className="py-2 px-4 border-b">Role</th>
-                        <th className="py-2 px-4 border-b">Credits</th>
-                        <th className="py-2 px-4 border-b">Requests</th>
-                        <th className="py-2 px-4 border-b">Actions</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_ID}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_USERNAME}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_EMAIL}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_ROLE}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_CREDITS}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_REQUESTS}</th>
+                        <th className="py-2 px-4 border-b">{Messages.USER_TABLE_ACTIONS}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -115,7 +116,7 @@ const AdminDashboard: React.FC = () => {
                                     onClick={() => deleteUser(user.userId)}
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
                                 >
-                                    Delete
+                                    {Messages.DELETE_BUTTON}
                                 </button>
                             </td>
                         </tr>
@@ -125,13 +126,13 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="mb-4">
-                <h2 className="text-xl font-semibold">Endpoint Management</h2>
+                <h2 className="text-xl font-semibold">{Messages.ENDPOINT_MANAGEMENT_TITLE}</h2>
                 <table className="min-w-full bg-white">
                     <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b">METHOD</th>
-                        <th className="py-2 px-4 border-b">URI</th>
-                        <th className="py-2 px-4 border-b">Requests</th>
+                        <th className="py-2 px-4 border-b">{Messages.ENDPOINT_TABLE_METHOD}</th>
+                        <th className="py-2 px-4 border-b">{Messages.ENDPOINT_TABLE_URI}</th>
+                        <th className="py-2 px-4 border-b">{Messages.ENDPOINT_TABLE_REQUESTS}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -147,6 +148,6 @@ const AdminDashboard: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
 export default AdminDashboard;

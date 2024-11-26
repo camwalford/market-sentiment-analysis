@@ -1,6 +1,7 @@
 // services/authAPI.ts
 import API_URL from "../config/API";
 import { LoginResponse, User, ApiError } from "../types/auth";
+import { Messages } from "../messages/eng";
 
 class AuthAPI {
     private static async handleResponse<T>(response: Response): Promise<T> {
@@ -8,7 +9,7 @@ class AuthAPI {
 
         if (!response.ok) {
             const errorData: ApiError = text ? JSON.parse(text) : {
-                message: "An unexpected error occurred",
+                message: Messages.API_DEFAULT_ERROR,
                 status: response.status
             };
             throw new Error(errorData.message);
@@ -16,6 +17,7 @@ class AuthAPI {
 
         return text ? JSON.parse(text) : {};
     }
+
 
     private static getHeaders(): HeadersInit {
         return {

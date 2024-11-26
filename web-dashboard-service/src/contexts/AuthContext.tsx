@@ -3,12 +3,13 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useCa
 import { useNavigate } from "react-router-dom";
 import { AuthState, AuthContextType, User } from "../types/auth";
 import AuthAPI from "../services/authAPI";
+import { Messages } from "../messages/eng";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) throw new Error("useAuth must be used within AuthContext");
+    if (!context) throw new Error(Messages.AUTH_CONTEXT_ERROR);
     return context;
 };
 
@@ -31,11 +32,11 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             });
             return true;
         } catch (error) {
-            console.log("Session validation failed:", error);
+            console.log(Messages.SESSION_VALIDATION_DEBUG, error);
             setAuth({
                 user: null,
                 loading: false,
-                error: error instanceof Error ? error.message : "Session validation failed",
+                error: error instanceof Error ? error.message : Messages.SESSION_VALIDATION_ERROR,
             });
             return false;
         }
@@ -43,16 +44,12 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
 
     useEffect(() => {
         validateSession().catch(error => {
-            console.error('Error during session validation:', error);
+            console.error(Messages.SESSION_VALIDATION_ERROR_DEBUG, error);
         });
     }, [validateSession]);
 
-
-
-
     const handleLogin = async (username: string, password: string) => {
-
-        console.log("handleLogin");
+        console.log(Messages.LOGIN_DEBUG);
         setAuth(prev => ({ ...prev, loading: true, error: null }));
         try {
             const response = await AuthAPI.login(username, password);
@@ -66,7 +63,7 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             setAuth(prev => ({
                 ...prev,
                 loading: false,
-                error: error instanceof Error ? error.message : "Login failed",
+                error: error instanceof Error ? error.message : Messages.LOGIN_ERROR,
             }));
             throw error;
         }
@@ -100,12 +97,11 @@ const AuthProviderWithNavigate: React.FC<{ children: ReactNode }> = ({ children 
             setAuth(prev => ({
                 ...prev,
                 loading: false,
-                error: error instanceof Error ? error.message : "Registration failed",
+                error: error instanceof Error ? error.message : Messages.REGISTRATION_ERROR,
             }));
             throw error;
         }
     };
-
 
     const updateUserData = useCallback((userData: Partial<User>) => {
         setAuth(prev => ({

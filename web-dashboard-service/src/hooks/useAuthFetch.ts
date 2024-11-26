@@ -2,6 +2,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AuthAPI from '../services/authAPI';
+import { Messages } from '../messages/eng';
 
 export const useAuthFetch = () => {
     const { auth, handleLogout } = useAuth();
@@ -35,7 +36,7 @@ export const useAuthFetch = () => {
                     });
 
                     if (!retryResponse.ok) {
-                        throw new Error('Request failed after token refresh');
+                        throw new Error(Messages.AUTH_FETCH_TOKEN_REFRESH_FAILED);
                     }
 
                     return retryResponse;
@@ -43,18 +44,18 @@ export const useAuthFetch = () => {
                     // If refresh fails, logout
                     await handleLogout();
                     navigate('/login');
-                    throw new Error('Session expired');
+                    throw new Error(Messages.AUTH_FETCH_SESSION_EXPIRED);
                 }
             }
 
             if (!response.ok) {
-                throw new Error('Request failed');
+                throw new Error(Messages.AUTH_FETCH_REQUEST_FAILED);
             }
 
             return response;
         } catch (error) {
             // Handle network errors
-            console.error('Fetch error:', error);
+            console.error(Messages.AUTH_FETCH_ERROR_PREFIX, error);
             throw error;
         }
     };

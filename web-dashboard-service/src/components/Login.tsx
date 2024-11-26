@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import FormField from "./common/FormField";
 import { ErrorMessage } from "./common/ErrorMessage";
 import { LoadingSpinner } from "./common/LoadingSpinner";
+import { Messages } from "../messages/eng";
 
 interface LoginFormData {
     username: string;
@@ -33,7 +34,7 @@ const Login: React.FC = () => {
         try {
             await handleLogin(formData.username, formData.password);
         } catch (error) {
-            setError(error instanceof Error ? error.message : "An unexpected error occurred");
+            setError(error instanceof Error ? error.message : Messages.UNEXPECTED_ERROR);
         }
     };
 
@@ -42,7 +43,7 @@ const Login: React.FC = () => {
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Sign in to your account
+                        {Messages.LOGIN_PAGE_TITLE}
                     </h2>
                 </div>
 
@@ -56,7 +57,7 @@ const Login: React.FC = () => {
                             type="text"
                             value={formData.username}
                             onChange={handleChange}
-                            placeholder="Username"
+                            placeholder={Messages.USERNAME_PLACEHOLDER}
                             autoComplete="username"
                             isFirst
                         />
@@ -67,7 +68,7 @@ const Login: React.FC = () => {
                             type="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="Password"
+                            placeholder={Messages.PASSWORD_PLACEHOLDER}
                             autoComplete="current-password"
                             isLast
                         />
@@ -88,7 +89,7 @@ const Login: React.FC = () => {
                             }
                             `}
                         >
-                            {auth.loading ? <LoadingSpinner /> : "Sign in"}
+                            {auth.loading ? <LoadingSpinner /> : Messages.SIGN_IN_BUTTON}
                         </button>
                     </div>
                 </form>
@@ -98,7 +99,7 @@ const Login: React.FC = () => {
                         to="/register"
                         className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-150"
                     >
-                        Don't have an account? Sign up
+                        {Messages.SIGN_UP_LINK}
                     </Link>
                 </div>
             </div>

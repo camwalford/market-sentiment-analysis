@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import FormField from './common/FormField';
-import {ErrorMessage} from './common/ErrorMessage';
-import {LoadingSpinner} from './common/LoadingSpinner';
+import { ErrorMessage } from './common/ErrorMessage';
+import { LoadingSpinner } from './common/LoadingSpinner';
+import { Messages } from '../messages/eng';
 
 interface RegisterFormData {
     username: string;
@@ -20,6 +21,7 @@ const Register: React.FC = () => {
         password: '',
     });
     const [error, setError] = useState<string>('');
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({
             ...prev,
@@ -38,7 +40,7 @@ const Register: React.FC = () => {
                 formData.password
             );
         } catch (error) {
-            setError(error instanceof Error ? error.message : 'Registration failed');
+            setError(error instanceof Error ? error.message : Messages.REGISTRATION_GENERIC_ERROR);
         }
     };
 
@@ -47,7 +49,7 @@ const Register: React.FC = () => {
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Sign up for an account
+                        {Messages.REGISTER_PAGE_TITLE}
                     </h2>
                 </div>
 
@@ -61,7 +63,7 @@ const Register: React.FC = () => {
                             type="text"
                             value={formData.username}
                             onChange={handleChange}
-                            placeholder="Username"
+                            placeholder={Messages.USERNAME_PLACEHOLDER}
                             autoComplete="username"
                             isFirst
                         />
@@ -72,7 +74,7 @@ const Register: React.FC = () => {
                             type="email"
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="Email address"
+                            placeholder={Messages.REGISTER_EMAIL_PLACEHOLDER}
                             autoComplete="email"
                         />
 
@@ -82,7 +84,7 @@ const Register: React.FC = () => {
                             type="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="Password"
+                            placeholder={Messages.REGISTER_PASSWORD_PLACEHOLDER}
                             autoComplete="new-password"
                             isLast
                         />
@@ -102,7 +104,7 @@ const Register: React.FC = () => {
                             }
                             `}
                         >
-                            {auth.loading ? <LoadingSpinner /> : "Sign up"}
+                            {auth.loading ? <LoadingSpinner /> : Messages.REGISTER_BUTTON}
                         </button>
                     </div>
                 </form>
@@ -112,7 +114,7 @@ const Register: React.FC = () => {
                         to="/login"
                         className="font-medium text-blue-600 hover:text-blue-500"
                     >
-                        Already have an account? Sign in
+                        {Messages.REGISTER_LOGIN_LINK}
                     </Link>
                 </div>
             </div>
