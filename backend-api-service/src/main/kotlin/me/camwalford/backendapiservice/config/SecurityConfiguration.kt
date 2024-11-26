@@ -1,5 +1,6 @@
 package me.camwalford.backendapiservice.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.DispatcherType.ERROR
 import jakarta.servlet.DispatcherType.FORWARD
 import org.springframework.context.annotation.Bean
@@ -17,11 +18,14 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
+
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfiguration(
-    private val authenticationProvider: AuthenticationProvider
+    private val authenticationProvider: AuthenticationProvider,
+    private val objectMapper: ObjectMapper
 ) {
     @Bean
     fun securityFilterChain(
@@ -61,6 +65,10 @@ class SecurityConfiguration(
             }
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .exceptionHandling {
+                it.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper))
+                it.accessDeniedHandler(CustomAccessDeniedHandler(objectMapper))
+            }
             .build()
 
     @Bean

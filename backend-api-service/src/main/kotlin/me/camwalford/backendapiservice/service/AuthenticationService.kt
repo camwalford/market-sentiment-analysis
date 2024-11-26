@@ -118,10 +118,10 @@ class AuthenticationService(
         }
     }
 
-
-    private fun getCookieValue(request: HttpServletRequest, name: String): String? {
-        return request.cookies?.find { it.name == name }?.value
-    }
+//
+//    private fun getCookieValue(request: HttpServletRequest, name: String): String? {
+//        return request.cookies?.find { it.name == name }?.value
+//    }
 
     private fun createAccessToken(user: UserDetails): String {
         logger.debug("Creating access token for user: ${user.username}")
@@ -141,13 +141,13 @@ class AuthenticationService(
 
     private fun getAccessTokenExpiration(): Date {
         val expirationDate = Date(System.currentTimeMillis() + jwtProperties.accessTokenExpiration)
-        logger.debug("Access token expiration date: $expirationDate")
+        logger.debug("Access token expiration date: {}", expirationDate)
         return expirationDate
     }
 
     private fun getRefreshTokenExpiration(): Date {
         val expirationDate = Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiration)
-        logger.debug("Refresh token expiration date: $expirationDate")
+        logger.debug("Refresh token expiration date: {}", expirationDate)
         return expirationDate
     }
 }

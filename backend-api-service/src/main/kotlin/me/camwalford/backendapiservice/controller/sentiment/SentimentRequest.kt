@@ -8,7 +8,7 @@ data class SentimentRequest(
         example = "AAPL",
         required = true
     )
-    val ticker: String,
+    var ticker: String,
 
     @io.swagger.v3.oas.annotations.media.Schema(
         description = "Start date for analysis period (YYYY-MM-DD)",

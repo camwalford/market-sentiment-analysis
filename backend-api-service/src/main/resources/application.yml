@@ -1,4 +1,5 @@
 spring:
+
   application:
     name: backend-api-service
   config:
@@ -13,6 +14,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  mvc:
+    problemdetails:
+      enabled: true
   docker:
     compose:
       enabled: false

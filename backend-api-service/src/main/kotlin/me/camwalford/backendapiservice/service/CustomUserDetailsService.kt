@@ -25,7 +25,7 @@ class CustomUserDetailsService(
                 logger.warn("User not found with username: $username")
                 throw UsernameNotFoundException("User not found")
             }
-        logger.info(
+        logger.debug(
             "Loaded user details: username={}, password={}, ={}",
             user.username,
             user.password,
