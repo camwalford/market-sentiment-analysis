@@ -21,9 +21,7 @@ const App: React.FC = () => {
                             path={route.path}
                             element={
                                 <PublicRoute>
-                                    <React.Suspense fallback={<LoadingScreen />}>
-                                        {route.element}
-                                    </React.Suspense>
+                                    {route.element}
                                 </PublicRoute>
                             }
                         />
@@ -36,9 +34,7 @@ const App: React.FC = () => {
                             path={route.path}
                             element={
                                 <PrivateRoute allowedRoles={route.roles}>
-                                    <React.Suspense fallback={<LoadingScreen />}>
-                                        {route.element}
-                                    </React.Suspense>
+                                    {route.element}
                                 </PrivateRoute>
                             }
                         />
@@ -52,9 +48,7 @@ const App: React.FC = () => {
                     <Route
                         path="*"
                         element={
-                            <React.Suspense fallback={<LoadingScreen />}>
-                                <NotFound />
-                            </React.Suspense>
+                            <NotFound />
                         }
                     />
                 </Routes>
