@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API_URL from '../config/API';
+import {API_URL} from '../config/API';
 import {
     ComposedChart,
     Bar,

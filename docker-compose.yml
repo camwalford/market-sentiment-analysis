@@ -20,32 +20,32 @@ services:
       timeout: 5s
       retries: 5
 
-  backend-api-service:
-    build:
-      context: backend-api-service
-      dockerfile: Dockerfile
-      args:
-        JAVA_VERSION: ${JAVA_VERSION:-21}
-        PORT: ${BACKEND_API_SERVICE_PORT:-8080}  # Add port build argument
-    depends_on:
-      mysql:
-        condition: service_healthy  # Wait for MySQL to be ready
-    environment:
-      PORT: ${BACKEND_API_SERVICE_PORT:-8080}
-      JAVA_VERSION: ${JAVA_VERSION:-21}
-      MYSQL_HOST: mysql
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
-      MYSQL_USER: ${MYSQL_USER:-admin}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      JWT_KEY: ${JWT_KEY:?Must set JWT_KEY}
-      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
-      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
-      FINNHUB_INGESTION_SERVICE_URL: http://finnhub-ingestion-service:${FINNHUB_INGESTION_SERVICE_PORT}
-      BERT_SENTIMENT_ANALYSIS_SERVICE_URL: http://bert-sentiment-analysis-service:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT}
-      WEB_DASHBOARD_SERVICE_URL: ${WEB_DASHBOARD_SERVICE_URL}:${WEB_DASHBOARD_SERVICE_PORT}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
-    ports:
-      - '${BACKEND_API_SERVICE_PORT:-8080}:${BACKEND_API_SERVICE_PORT:-8080}'
+#  backend-api-service:
+#    build:
+#      context: backend-api-service
+#      dockerfile: Dockerfile
+#      args:
+#        JAVA_VERSION: ${JAVA_VERSION:-21}
+#        PORT: ${BACKEND_API_SERVICE_PORT:-8080}  # Add port build argument
+#    depends_on:
+#      mysql:
+#        condition: service_healthy  # Wait for MySQL to be ready
+#    environment:
+#      PORT: ${BACKEND_API_SERVICE_PORT:-8080}
+#      JAVA_VERSION: ${JAVA_VERSION:-21}
+#      MYSQL_HOST: mysql
+#      MYSQL_DATABASE: ${MYSQL_DATABASE:-marketdb}
+#      MYSQL_USER: ${MYSQL_USER:-admin}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#      JWT_KEY: ${JWT_KEY:?Must set JWT_KEY}
+#      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
+#      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-86400000}
+#      FINNHUB_INGESTION_SERVICE_URL: http://finnhub-ingestion-service:${FINNHUB_INGESTION_SERVICE_PORT}
+#      BERT_SENTIMENT_ANALYSIS_SERVICE_URL: http://bert-sentiment-analysis-service:${BERT_SENTIMENT_ANALYSIS_SERVICE_PORT}
+#      WEB_DASHBOARD_SERVICE_URL: ${WEB_DASHBOARD_SERVICE_URL}:${WEB_DASHBOARD_SERVICE_PORT}
+#      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+#    ports:
+#      - '${BACKEND_API_SERVICE_PORT:-8080}:${BACKEND_API_SERVICE_PORT:-8080}'
 
   finnhub-ingestion-service:
     build:

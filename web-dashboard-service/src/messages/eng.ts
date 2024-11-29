@@ -41,6 +41,16 @@ export const Messages = {
     UNEXPECTED_ERROR: 'An unexpected error occurred',
     GENERIC_ERROR_MESSAGE: 'Something went wrong',
 
+    // Credit messages
+    SET_CREDITS_ERROR: 'Failed to update credits',
+    SET_CREDITS: 'Set Credits',
+    INVALID_CREDITS_AMOUNT: 'Invalid credits amount',
+    USER_DELETED_SUCCESS: 'User deleted successfully',
+    CREDITS_UPDATED_SUCCESS: 'Credits updated successfully',
+    INVALID_CREDIT_AMOUNT: 'Please enter a valid credit amount.',
+    SET_CREDITS_CONFIRMATION: 'Are you sure you want to set the credits for this user?',
+    SETTING_CREDITS: 'Setting...',
+
     // Error pages
     NOT_FOUND_MESSAGE: "The page you're looking for doesn't exist or has been moved.",
 

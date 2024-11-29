@@ -444,7 +444,7 @@ class UserController(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}/add-credits")
+    @PatchMapping("/{id}/add-credits/{amount}")
     @Operation(
         summary = "Add credits to user account",
         description = "Adds credits to a user account. Requires ADMIN role.",
@@ -493,12 +493,12 @@ class UserController(
             )
         ]
     )
-    fun addCredits(@PathVariable id: Long, @RequestParam amount: Int): UserResponse {
+    fun addCredits(@PathVariable id: Long, @PathVariable amount: Int): UserResponse {
         return userService.addCreditsById(id, amount).let { UserResponse.toResponse(it) }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}/deduct-credits")
+    @PatchMapping("/{id}/deduct-credits/{amount}")
     @Operation(
         summary = "Remove credits from user account",
         description = "Removes credits from a user account. Requires ADMIN role.",
@@ -547,7 +547,62 @@ class UserController(
             )
         ]
     )
-    fun deductCredits(@PathVariable id: Long, @RequestParam amount: Int): UserResponse {
+    fun deductCredits(@PathVariable id: Long, @PathVariable amount: Int): UserResponse {
         return userService.deductCreditsById(id, amount).let { UserResponse.toResponse(it) }
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/credits/{amount}")
+    @Operation(
+        summary = "Set credits for user account",
+        description = "Sets the credits for a user account. Requires ADMIN role.",
+        security = [SecurityRequirement(name = "bearer-auth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Credits set successfully for user account",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated",
+                ref = "#/components/responses/UnauthorizedError"
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Insufficient permissions",
+                ref = "#/components/responses/ForbiddenError"
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [Content(
+                    mediaType = "application/problem+json",
+                    schema = Schema(implementation = ProblemDetail::class),
+                    examples = [
+                        ExampleObject(
+                            name = "userNotFound",
+                            summary = "User not found",
+                            description = "Example of error when user ID doesn't exist",
+                            value = """
+                    {
+                        "type": "https://api.yourservice.com/errors/USER_001",
+                        "title": "User Not Found",
+                        "status": 404,
+                        "detail": "User with ID {id} could not be found",
+                        "errorCode": "USER_001"
+                    }
+                    """
+                        )
+                    ]
+                )]
+            )
+        ]
+    )
+    fun updateCredits(@PathVariable id: Long, @PathVariable amount: Int): UserResponse {
+        return userService.updateCreditsById(id, amount).let { UserResponse.toResponse(it) }
     }
 }

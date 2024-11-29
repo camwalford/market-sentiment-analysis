@@ -1,7 +1,8 @@
 // services/authAPI.ts
-import API_URL from "../config/API";
-import { LoginResponse, User, ApiError } from "../types/auth";
+import {API_URL} from "../config/API";
+import { LoginResponse, ApiError } from "../types/auth";
 import { Messages } from "../messages/eng";
+import {User} from "../types/user";
 
 class AuthAPI {
     private static async handleResponse<T>(response: Response): Promise<T> {

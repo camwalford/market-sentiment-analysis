@@ -1,9 +1,10 @@
 // contexts/AuthContext.tsx
 import React, { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthState, AuthContextType, User } from "../types/auth";
+import { AuthState, AuthContextType } from "../types/auth";
 import AuthAPI from "../services/authAPI";
 import { Messages } from "../messages/eng";
+import {User} from "../types/user";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

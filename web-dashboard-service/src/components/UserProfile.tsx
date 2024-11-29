@@ -1,22 +1,14 @@
 // components/UserProfile.tsx
 import React, { useState, useEffect } from 'react';
 import { useAuthFetch } from '../hooks/useAuthFetch';
-import API_URL from '../config/API';
+import {API_URL, USER_PROFILE_API_URL} from '../config/API';
 import { Messages } from '../messages/eng';
+import {User} from "../types/user";
 
-const USER_PROFILE_API_URL = API_URL + '/user/me';
 
-interface UserProfileData {
-    id: number;
-    username: string;
-    email: string;
-    role: string;
-    credits: number;
-    totalRequests: number;
-}
 
 const UserProfile: React.FC = () => {
-    const [profile, setProfile] = useState<UserProfileData | null>(null);
+    const [profile, setProfile] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { fetchWithAuth } = useAuthFetch();

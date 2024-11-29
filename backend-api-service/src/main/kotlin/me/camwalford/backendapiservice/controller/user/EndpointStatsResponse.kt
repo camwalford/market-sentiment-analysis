@@ -7,7 +7,7 @@ data class EndpointStatsResponse(
     @Schema(description = "HTTP method", example = "GET")
     val method: String,
 
-    @Schema(description = "Endpoint URI", example = "/api/v1/customers/{id}")
+    @Schema(description = "Endpoint URI", example = "/api/users/customers/{id}")
     val uri: String,
 
     @Schema(description = "Total number of requests", example = "145")

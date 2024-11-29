@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useAuthFetch } from '../hooks/useAuthFetch';
-import API_URL from '../config/API';
-import {UserRole} from "../types/auth";
 import { Messages } from '../messages/eng';
+import { useAuthFetch } from "../hooks/useAuthFetch";
+import { ENDPOINTS_API_URL, USER_API_URL, USER_REQUESTS_API_URL } from "../config/API";
+import { useAuth } from "../contexts/AuthContext";
+import {UserRole} from "../types/user";
 
-const USER_API_URL = API_URL + '/user';
-const USER_REQUESTS_API_URL = USER_API_URL + '/user-requests';
-const ENDPOINT_API_URL = USER_API_URL + '/endpoint-requests';
-
-interface Endpoint {
-    method: string;
-    uri: string;
-    totalRequests: number;
-}
-
-interface User {
+export interface User {
     userId: number;
     username: string;
     email: string;
@@ -24,24 +14,30 @@ interface User {
     totalRequests: number;
 }
 
-
 const AdminDashboard: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { auth } = useAuth();
     const { fetchWithAuth } = useAuthFetch();
-    const [endpoints, setEndpoints] = useState([]);
+    const [endpoints, setEndpoints] = useState<any[]>([]);
+    const [creditInputs, setCreditInputs] = useState<{ [key: number]: string }>({});
+    const [creditErrors, setCreditErrors] = useState<{ [key: number]: string }>({});
+    const [settingCredits, setSettingCredits] = useState<{ [key: number]: boolean }>({});
 
     useEffect(() => {
         fetchUsers();
+        fetchEndpoints();
     }, []);
 
     const fetchUsers = async () => {
         try {
             setLoading(true);
             const response = await fetchWithAuth(USER_REQUESTS_API_URL);
-            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(Messages.FETCH_USERS_ERROR);
+            }
+            const data: User[] = await response.json();
             setUsers(data);
             setError(null);
         } catch (err) {
@@ -51,14 +47,13 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        fetchEndpoints();
-    }, []);
-
     const fetchEndpoints = async () => {
         try {
             setLoading(true);
-            const response = await fetchWithAuth(ENDPOINT_API_URL);
+            const response = await fetchWithAuth(ENDPOINTS_API_URL);
+            if (!response.ok) {
+                throw new Error(Messages.FETCH_ENDPOINTS_ERROR);
+            }
             const data = await response.json();
             setEndpoints(data);
             setError(null);
@@ -79,6 +74,92 @@ const AdminDashboard: React.FC = () => {
             } catch (err) {
                 setError(Messages.DELETE_USER_ERROR);
             }
+        }
+    };
+
+    const handleCreditInputChange = (userId: number, value: string) => {
+        setCreditInputs(prev => ({
+            ...prev,
+            [userId]: value
+        }));
+        setCreditErrors(prev => ({
+            ...prev,
+            [userId]: ''
+        }));
+    };
+
+    const setCredits = async (userId: number) => {
+        const inputValue = creditInputs[userId];
+        const amount = parseInt(inputValue, 10);
+
+        console.log('amount:', amount);
+        console.log('inputValue:', inputValue);
+        console.log('creditInputs:', creditInputs);
+
+        if (isNaN(amount) || amount < 0) {
+            setCreditErrors(prev => ({
+                ...prev,
+                [userId]: Messages.INVALID_CREDIT_AMOUNT
+            }));
+            return;
+        }
+
+        // Confirm action
+        if (!window.confirm(Messages.SET_CREDITS_CONFIRMATION)) {
+            return;
+        }
+
+        try {
+            setSettingCredits(prev => ({
+                ...prev,
+                [userId]: true
+            }));
+
+            console.log( 'userId:', userId );
+            console.log( 'amount:', amount );
+            console.log( 'USER_API_URL:', USER_API_URL );
+            // Construct the endpoint with actual userId and amount
+            const endpoint = `${USER_API_URL}/${userId}/credits/${amount}`;
+
+            const response = await fetchWithAuth(endpoint, {
+                method: 'PATCH',
+            });
+
+            if (!response.ok) {
+                throw new Error(Messages.SET_CREDITS_ERROR);
+            }
+
+            // Optionally, you can get the updated user data from the response
+            const updatedUser: User = await response.json();
+
+            // Update the user's credits in the local state
+            setUsers(prevUsers =>
+                prevUsers.map(user =>
+                    user.userId === userId ? { ...user, credits: updatedUser.credits} : user
+                )
+            );
+
+            // Clear the input
+            setCreditInputs(prev => ({
+                ...prev,
+                [userId]: ''
+            }));
+
+            setCreditErrors(prev => ({
+                ...prev,
+                [userId]: ''
+            }));
+
+        } catch (err) {
+            setCreditErrors(prev => ({
+                ...prev,
+                [userId]: Messages.SET_CREDITS_ERROR
+            }));
+        } finally {
+            setSettingCredits(prev => ({
+                ...prev,
+                [userId]: false
+            }));
         }
     };
 
@@ -112,12 +193,39 @@ const AdminDashboard: React.FC = () => {
                             <td className="py-2 px-4 border-b">{user.credits}</td>
                             <td className="py-2 px-4 border-b">{user.totalRequests}</td>
                             <td className="py-2 px-4 border-b">
-                                <button
-                                    onClick={() => deleteUser(user.userId)}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                                >
-                                    {Messages.DELETE_BUTTON}
-                                </button>
+                                <div className="flex flex-col space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => deleteUser(user.userId)}
+                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                                        >
+                                            {Messages.DELETE_BUTTON}
+                                        </button>
+                                        <input
+                                            type="number"
+                                            name={`set-credits-${user.userId}`}
+                                            value={creditInputs[user.userId] || ''}
+                                            placeholder={user.credits.toString()}
+                                            className="border border-gray-400 p-1 w-24"
+                                            min="0"
+                                            onChange={(e) => handleCreditInputChange(user.userId, e.target.value)}
+                                        />
+                                        <button
+                                            onClick={() => setCredits(user.userId)}
+                                            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ${
+                                                settingCredits[user.userId] ? 'opacity-50 cursor-not-allowed' : ''
+                                            }`}
+                                            disabled={settingCredits[user.userId]}
+                                        >
+                                            {settingCredits[user.userId] ? Messages.SETTING_CREDITS : Messages.SET_CREDITS}
+                                        </button>
+                                    </div>
+                                    {creditErrors[user.userId] && (
+                                        <div className="text-red-500 text-sm">
+                                            {creditErrors[user.userId]}
+                                        </div>
+                                    )}
+                                </div>
                             </td>
                         </tr>
                     ))}

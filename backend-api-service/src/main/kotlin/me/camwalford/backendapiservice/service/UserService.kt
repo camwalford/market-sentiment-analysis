@@ -254,4 +254,21 @@ class UserService(
         userRepository.save(user)
         logger.info("Successfully added $amount credits to user ${user.username}")
     }
+
+    @Transactional
+    fun updateCreditsById(id: Long, amount: Int): User {
+        logger.info("Updating credits for user with id: $id")
+        val user = findById(id)
+        updateCredits(user, amount)
+        return user
+    }
+
+    @Transactional
+    fun updateCredits(user: User, amount: Int) {
+        logger.info("Updating credits for user with id: ${user.id}")
+
+        user.credits = amount
+        userRepository.save(user)
+        logger.info("Successfully updated credits for user ${user.username}")
+    }
 }

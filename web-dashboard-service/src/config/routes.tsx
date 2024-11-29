@@ -1,8 +1,8 @@
 // config/routes.tsx
 import React from 'react';
-import { UserRole } from '../types/auth';
 import SuspenseWrapper from '../components/SuspenseWrapper';
 import UserProfile from "../components/UserProfile";
+import {UserRole} from "../types/user";
 
 // Lazy load components
 const StockSentimentDashboard = React.lazy(() => import('../components/StockSentimentDashboard'));

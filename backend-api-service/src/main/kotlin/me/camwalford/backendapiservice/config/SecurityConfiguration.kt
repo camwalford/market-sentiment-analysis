@@ -79,7 +79,7 @@ class SecurityConfiguration(
             "http://web-dashboard-service:3000",
             "https://stocks.camwalford.me"
         )
-        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf(
             "Content-Type",
             "Authorization",

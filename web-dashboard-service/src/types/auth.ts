@@ -1,14 +1,5 @@
-// types/auth.ts
-export type UserRole = 'USER' | 'ADMIN' | 'PREMIUM_USER';
+import {User} from "./user";
 
-export interface User {
-    id: number;
-    username: string;
-    email: string;
-    role: UserRole;
-    credits: number;
-    totalRequests: number;
-}
 
 export interface AuthState {
     user: User | null;

@@ -2,8 +2,8 @@ import React, { ReactNode} from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
-import { UserRole } from "../types/auth";
 import LoadingScreen from "../components/LoadingScreen";
+import {UserRole} from "../types/user";
 
 interface PrivateRouteProps {
     children: ReactNode;
